@@ -1,0 +1,64 @@
+---
+layout: default
+title: "Blog"
+description: |
+  .NET Developer
+---
+
+<div itemscope="" itemtype="http://schema.org/Blog">
+  {% for post in paginator.posts %}
+    {% if post.noindex %}
+    {% else %}
+      <div class="wrapper">
+        <section class="front" itemprop="blogPosts" itemscope="" itemtype="http://schema.org/BlogPosting">
+          <article>
+            <div class="subtitle">
+              <h1>
+                <a href="{{ post.url }}">
+                  <span itemprop="name headline mainEntityOfPage">{{ post.title }}</span>
+                </a>
+              </h1>
+              <ul>
+                <li>
+                  <time itemprop="datePublished dateModified" datetime="{{ post.date | date_to_xmlschema }}">
+                    {{ post.date | date: "%-d %B %Y" }}
+                  </time>
+                </li>
+                <li itemprop="wordCount">
+                  {{ post.content | number_of_words | append: ' words' }}
+                </li>
+                <li>
+                  {% capture words %}
+                  {{ post.content | number_of_words }}
+                  {% endcapture %}
+                  {{ words | plus: 180 | divided_by: 180 | append: ' minutes to read' }}
+                </li>
+                <li>
+                  <i class="icon-comment"></i>
+                  <a href="{{ site.url }}{{ post.url }}#disqus_thread" itemprop="discussionUrl">comments</a>
+                </li>
+              </ul>
+            </div>
+            <div class="main" itemprop="description">
+              {{ post.content | markdownify | strip_html | truncatewords: 70 }}
+            </div>
+            <p>
+              <a href="{{ post.url }}" itemprop="url">
+                Continue...
+              </a>
+            </p>
+          </article>
+        </section>
+      </div>
+    {% endif %}
+  {% endfor %}
+  </div>
+
+<!-- {% for post in paginator.posts %}
+  <article>
+    {{ post.date | date: "%B %-d, %Y" }}
+    <h1>{{ post.title }}</h1>
+    {{ post.excerpt }}
+    <a href="{{ post.url | prepend: site.baseurl }}">Read...</a>
+  </article>
+{% endfor %} -->

@@ -1,0 +1,30 @@
+---
+layout: default
+---
+
+<article itemscope="" itemtype="http://schema.org/BlogPosting">
+  <div itemprop="image" itemscope="" itemtype="http://schema.org/ImageObject">
+    <meta itemprop="url" content="{{ site.url }}/images/image.png"/>
+    <meta itemprop="height" content="250"/>
+    <meta itemprop="width" content="250"/>
+  </div>
+  <meta itemprop="image" content=""/>
+  <div itemscope="" itemprop="author" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Nikita Burmistrov"/>
+  </div>
+  <div itemscope="" itemprop="publisher" itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Nikita Burmistrov"/>
+    <div itemprop="logo" itemscope="" itemtype="http://schema.org/ImageObject">
+      <meta itemprop="url" content="{{ site.url }}/images/image.png"/>
+      <meta itemprop="height" content="250"/>
+      <meta itemprop="width" content="250"/>
+    </div>
+  </div>
+  <p>
+    <span itemprop="datePublished dateModified" datetime="{{ page.date | date_to_xmlschema }}">
+      {{ page.date | date: "%B %-d, %Y" }}
+    </span>
+  </p>
+  <h1 itemprop="name headline mainEntityOfPage">{{ page.title }}</h1>
+  {{ content }}
+</article>

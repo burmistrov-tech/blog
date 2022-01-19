@@ -1,0 +1,67 @@
+---
+---
+
+@import 'defenitions';
+@import 'header';
+@import 'wrapper';
+@import 'post-preview';
+@import 'icons';
+@import 'fonts';
+
+%clear { clear: both; }
+
+%small { font-size: .85 * $em; }
+
+%strike { text-decoration: line-through; }
+
+* {
+  max-width: 100%;
+}
+
+body {
+  color: black;
+  font-size: 14;
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  position: relative;
+}
+
+a,
+a:visited {
+  color: inherit;
+  text-decoration: underline;
+  // scss-lint:disable PropertySpelling
+  text-decoration-thickness: 1px;
+  // scss-lint:enable PropertySpelling
+  &.foreign {
+    &:hover {
+      color: gray;
+    }
+  }
+}
+
+p {
+  @extend %primary-font;
+}
+
+h1 {
+  @extend %clear;
+  @extend %primary-font;
+  font-weight: bold;
+  font-size: 1.7 * $em;
+  line-height: 1.7 * $em;
+  margin-bottom: .4 * $em;
+
+  a {
+    text-decoration: none;
+  }
+}
+
+h2,
+h3 {
+  @extend %clear;
+  @extend %primary-font;
+  font-weight: bold;
+  position: relative;
+}

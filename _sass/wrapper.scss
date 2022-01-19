@@ -1,0 +1,21 @@
+@import 'defenitions';
+
+%wrapper {
+  box-sizing: border-box;
+  clear: both;
+  line-height: 1.10 * $em;
+  margin-left: auto;
+  margin-right: auto;
+  width: $width;
+
+  @media all and (max-width: $width) {
+    line-height: 1.6 * $em;
+    padding-left: $em;
+    padding-right: $em;
+    width: 100%;
+  }
+}
+
+.wrapper {
+  @extend %wrapper;
+}

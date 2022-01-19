@@ -1,0 +1,33 @@
+.header {
+  text-align: center;
+  
+  @media all and (max-width: $width) {
+    text-align: left;
+  }
+}
+
+.menu {
+  display: flex;
+  flex-wrap: inherit;
+  align-items: center;
+  justify-content: space-between;
+
+  .social {
+    margin: $em / 2;
+    font-size: $em;
+    list-style: none;
+  
+    li {
+      display: inline;
+      margin: 2px;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    i {
+      font-style: normal;
+    }
+  }
+}
