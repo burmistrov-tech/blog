@@ -41,7 +41,7 @@ description: |
             </div>
             <div class="main" itemprop="description">
               <p>
-                {{ post.content | markdownify | strip_html | truncatewords: 70 }}
+                {{ post.excerpt | truncatewords: 70 | remove: '<p>' | remove: '</p>' }}
               </p>
             </div>
             <p>
