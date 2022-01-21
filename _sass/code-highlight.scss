@@ -7,6 +7,8 @@
   @extend %highlight-color;
   margin-left: 0;
   word-break: break-word;
+  margin-inline-end: 0px;
+  border-radius: 5px;
 
   pre {
     margin: 0;
