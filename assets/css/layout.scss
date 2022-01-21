@@ -5,6 +5,7 @@
 @import 'header';
 @import 'wrapper';
 @import 'post-preview';
+@import 'code-highlight';
 @import 'icons';
 @import 'fonts';
 
@@ -43,6 +44,10 @@ a:visited {
 
 p {
   @extend %primary-font;
+}
+
+code {
+  @extend %code-font;
 }
 
 h1 {

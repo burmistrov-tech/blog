@@ -1,7 +1,15 @@
-@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro:400,500|Ubuntu+Mono:400|PT+Sans:400');
+@import url('https://fonts.googleapis.com/css?family=JetBrains+Mono:400,500|Ubuntu+Mono:400|PT+Sans:400|Libre+Baskerville:400');
+
+$code-font: 'JetBrains Mono', 'Ubuntu Mono', monospace;
+
+$primary-font: 'Libre Baskerville', 'PT Sans', 'Georgia', 'Times New Roman', serif;
 
 %primary-font {
   font-family: $primary-font;
   font-style: normal;
   font-weight: normal;
+}
+
+%code-font {
+  font-family: $code-font;  
 }

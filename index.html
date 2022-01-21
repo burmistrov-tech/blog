@@ -40,11 +40,13 @@ description: |
               </ul>
             </div>
             <div class="main" itemprop="description">
-              {{ post.content | markdownify | strip_html | truncatewords: 70 }}
+              <p>
+                {{ post.content | markdownify | strip_html | truncatewords: 70 }}
+              </p>
             </div>
             <p>
               <a href="{{ post.url }}" itemprop="url">
-                Continue...
+                Read...
               </a>
             </p>
           </article>
@@ -62,3 +64,4 @@ description: |
     <a href="{{ post.url | prepend: site.baseurl }}">Read...</a>
   </article>
 {% endfor %} -->
+<script id="dsq-count-scr" src="//www-burmistrov-tech.disqus.com/count.js" async></script>
