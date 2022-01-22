@@ -1,0 +1,33 @@
+{% if post %}
+  {% assign post_content = post.content %}
+  {% assign post_date = post.date %}
+  {% assign post_url = post.url %}
+{% else %}
+  {% assign post_content = page.content %}
+  {% assign post_date = page.date %}
+  {% assign post_url = page.url %}
+{% endif %}
+
+
+<ul class="post-metadata">
+  <li>
+    <time itemprop="datePublished dateModified" datetime="{{ post_date | date_to_xmlschema }}">
+      {{ post_date | date: "%-d %B %Y" }}
+    </time>
+  </li>
+  <li itemprop="wordCount">
+    {{ post_content | number_of_words | append: ' words' }}
+  </li>
+  <li>
+    {% capture words %}
+    {{ post_content | number_of_words }}
+    {% endcapture %}
+    {{ words | plus: 180 | divided_by: 180 | append: ' minutes to read' }}
+  </li>
+  <li>
+    <i class="icon-comment"></i>
+    <a href="{{ site.url }}{{ post_url }}#disqus_thread" itemprop="discussionUrl">comments</a>
+  </li>
+</ul>
+
+<script id="dsq-count-scr" src="//www-burmistrov-tech.disqus.com/count.js" async></script>
