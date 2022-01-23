@@ -9,19 +9,14 @@
 }
 
 .menu {
-  font-family: $primary-font;
-}
-
-%links {
   display: flex;
   flex-wrap: inherit;
   align-items: center;
+  justify-content: space-between;
+  font-family: $primary-font;
 }
 
 .social-links {
-  @extend %links;
-  justify-content: space-between;
-
   ul {
     margin: $em / 2;
     font-size: $em;
@@ -43,10 +38,9 @@
 }
 
 .static-links {
-  @extend %links;
-
   ul {
     margin: 0;
+    padding-inline-start: 0;
     list-style: none;
 
     li {

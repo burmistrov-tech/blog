@@ -7,8 +7,9 @@ description: >-
 
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: nburmistrov
+linkedin_username: nburmistrov
 github_username:  nburmistrov
+telegram_username: nburmistrov
 
 plugins:
   - jekyll-feed
@@ -24,7 +25,7 @@ exclude:
   - Gemfile.lock
 
 paginate: 8
-paginate_path: "p/:num"
+paginate_path: "page/:num"
 excerpt_separator: <!--more-->
 
 sass:
