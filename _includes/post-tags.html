@@ -1,0 +1,11 @@
+{% if page.tags %}
+  <ul class="tag-list">
+    
+    {%- for tag in page.tags -%}
+    
+    <li class="tag"><a href="/tags/{{ tag }}">#{{ tag }}</a></li> 
+    
+    {%- endfor -%}
+    
+  </ul>
+{% endif %}

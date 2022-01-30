@@ -1,7 +1,28 @@
-.tags {
+@import 'defenitions';
+
+.tag-page {
   padding-left: 20px;
 
   h2 {
     margin: 15px 0 10px 0;
+  }
+
+}
+
+ul.tag-list {
+  list-style-type: disc;
+  margin:0;
+  padding: 0;
+  
+  li {
+    display: inline;
+    background-color: #f2f2f2;
+    font-family: $code-font;
+    font-size: .65 * $em;
+    margin-right: .5 * $em;
+    padding: 0 .5 * $em;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: 5px;
   }
 }
