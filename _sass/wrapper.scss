@@ -1,8 +1,8 @@
 @import 'defenitions';
 
 %wrapper {
+  @extend %clear;
   box-sizing: border-box;
-  clear: both;
   line-height: 1.10 * $em;
   margin-left: auto;
   margin-right: auto;

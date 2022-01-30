@@ -1,7 +1,4 @@
-%highlight-color {
-  background: rgba(242, 242, 242, 1);
-  color: rgba(41, 41, 41, 1);
-}
+@import 'defenitions';
 
 .highlight {
   @extend %highlight-color;

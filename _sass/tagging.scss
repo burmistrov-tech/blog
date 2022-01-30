@@ -15,8 +15,8 @@ ul.tag-list {
   padding: 0;
   
   li {
+    @extend %highlight-color;
     display: inline;
-    background-color: #f2f2f2;
     font-family: $code-font;
     font-size: .65 * $em;
     margin-right: .5 * $em;
