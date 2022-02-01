@@ -1,0 +1,12 @@
+---
+layout: default
+---
+
+<h1>Tags:</h1>
+{% for tag in page.tags_posts %}
+  <div class="tag-page">
+    <h2>
+      <a href="/tags/{{ tag }}">#{{ tag }}</a>
+    </h2>
+  </div>
+{% endfor %}
