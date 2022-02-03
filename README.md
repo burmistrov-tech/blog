@@ -3,6 +3,7 @@ This is my blog.
 ## Getting Started
 
 ```bash
+bundle exec jekyll serve
 ```
 
 ### Prerequisites
