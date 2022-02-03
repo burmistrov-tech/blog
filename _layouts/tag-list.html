@@ -6,16 +6,16 @@ layout: default
 <div class="tag-page">
   <table>
     <tr>
-      <th>Tag</th>
-      <th>Amount</th>
+      <th style="width: 200px;">Tag name</th>
+      <th style="width: 200px;">Posts count</th>
     </tr>
     {% for tag_posts in page.tags_posts %}
     {% assign tag = tag_posts[0] %}
     {% assign posts = tag_posts[1] %}
 
     <tr>
-      <td>{{ tag }}</td>
-      <td>{{ posts.size }}</td>
+      <td class="tag"><a href="/tags/{{ tag }}">#{{ tag }}</a></td>
+      <td class="amount">{{ posts.size }}</td>
     </tr>
 
     {% endfor %}

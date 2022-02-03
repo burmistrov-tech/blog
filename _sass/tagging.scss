@@ -2,27 +2,35 @@
 
 .tag-page {
   padding-left: 20px;
+  font-size: 0.85 * $em;
 
   h2 {
     margin: 15px 0 10px 0;
   }
 
+  .amount {
+    // @extend %bold;
+    @extend %center;
+  }
+}
+
+.tag {
+  @extend %highlight-color;
+  font-family: $code-font;
+  font-size: .65 * $em;
+  margin-right: .5 * $em;
+  padding: 0 .5 * $em;
+  border-radius: 5px;
 }
 
 ul.tag-list {
   list-style-type: disc;
   margin:0;
   padding: 0;
-  
+
   li {
-    @extend %highlight-color;
     display: inline;
-    font-family: $code-font;
-    font-size: .65 * $em;
-    margin-right: .5 * $em;
-    padding: 0 .5 * $em;
     text-decoration: none;
     white-space: nowrap;
-    border-radius: 5px;
   }
 }

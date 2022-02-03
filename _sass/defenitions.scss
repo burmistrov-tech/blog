@@ -11,7 +11,7 @@ $primary-font: 'Libre Baskerville', 'Georgia', 'Times New Roman', serif;
 }
 
 %clear { clear: both; }
-
 %small { font-size: .85 * $em; }
-
 %strike { text-decoration: line-through; }
+%bold { font-weight: bold; }
+%center { text-align: center; }
