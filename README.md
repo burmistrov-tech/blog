@@ -2,6 +2,9 @@ This is my blog.
 
 ## Getting Started
 
+```bash
+```
+
 ### Prerequisites
 **My development enviroment**
 
