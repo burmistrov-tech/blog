@@ -1,0 +1,11 @@
+@import 'tagging';
+
+ul.post-tags {
+  list-style-type: disc;
+  margin:0;
+  padding: 0;
+
+  li {
+    @extend %list-item;
+  }
+}

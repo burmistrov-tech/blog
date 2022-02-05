@@ -2,22 +2,17 @@
 layout: default
 ---
 
-<h1>Tags:</h1>
-<div class="tag-page">
-  <table>
-    <tr>
-      <th style="width: 200px;">Tag name</th>
-      <th style="width: 200px;">Posts count</th>
-    </tr>
+<div class="tag-list">
+  <h1>Tags:</h1>
+  <ul>
     {% for tag_posts in page.tags_posts %}
     {% assign tag = tag_posts[0] %}
     {% assign posts = tag_posts[1] %}
 
-    <tr>
-      <td class="tag"><a href="/tags/{{ tag }}">#{{ tag }}</a></td>
-      <td class="amount">{{ posts.size }}</td>
-    </tr>
+    <li class="tag"> 
+      <a href="/tags/{{ tag }}">#{{ tag }} - {{ posts.size }} pcs.</a>
+    </li>
 
     {% endfor %}
-  </table>
+  </ul>  
 </div>

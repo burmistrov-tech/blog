@@ -5,7 +5,8 @@
 @import 'header';
 @import 'wrapper';
 @import 'metadata';
-@import 'tagging';
+@import 'tag-list';
+@import 'post-tags';
 @import 'code-highlight';
 @import 'footer';
 @import 'icons';
@@ -31,6 +32,7 @@ a:visited {
   // scss-lint:disable PropertySpelling
   text-decoration-thickness: 1px;
   // scss-lint:enable PropertySpelling
+  text-underline-position: from-font;
   &.foreign {
     &:hover {
       color: gray;

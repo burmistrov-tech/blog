@@ -1,17 +1,9 @@
 @import 'defenitions';
 
-.tag-page {
-  padding-left: 20px;
-  font-size: 0.85 * $em;
-
-  h2 {
-    margin: 15px 0 10px 0;
-  }
-
-  .amount {
-    // @extend %bold;
-    @extend %center;
-  }
+%list-item {
+  display: inline;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .tag {
@@ -21,16 +13,4 @@
   margin-right: .5 * $em;
   padding: 0 .5 * $em;
   border-radius: 5px;
-}
-
-ul.tag-list {
-  list-style-type: disc;
-  margin:0;
-  padding: 0;
-
-  li {
-    display: inline;
-    text-decoration: none;
-    white-space: nowrap;
-  }
 }

@@ -5,13 +5,12 @@ $em: 24px;
 $code-font: 'JetBrains Mono', 'Ubuntu Mono', monospace;
 $primary-font: 'Libre Baskerville', 'Georgia', 'Times New Roman', serif;
 
-%highlight-color {
-  background: rgba(242, 242, 242, 1);
-  color: rgba(41, 41, 41, 1);
-}
+%highlight-color { background: rgba(242, 242, 242, 1); color: rgba(41, 41, 41, 1); }
 
 %clear { clear: both; }
 %small { font-size: .85 * $em; }
 %strike { text-decoration: line-through; }
 %bold { font-weight: bold; }
 %center { text-align: center; }
+%flex { display: flex; flex-wrap: wrap; }
+%col { flex: 1 0 0%; }

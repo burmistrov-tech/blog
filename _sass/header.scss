@@ -9,8 +9,7 @@
 }
 
 .menu {
-  display: flex;
-  flex-wrap: inherit;
+  @extend %flex;
   align-items: center;
   justify-content: space-between;
   font-family: $primary-font;

@@ -1,0 +1,20 @@
+@import 'tagging';
+
+.tag-list {
+  font-size: 0.85 * $em;
+
+  h2 {
+    margin: 15px 0 10px 0;
+  }
+
+  ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 0 10px 0 10px;
+
+    li {
+      @extend %list-item;
+      margin: 0.2em;
+    }
+  }
+}
