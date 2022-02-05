@@ -2,7 +2,7 @@ This is my blog.
 
 ## Getting Started
 
-```bash
+```powershell
 bundle exec jekyll serve
 ```
 
