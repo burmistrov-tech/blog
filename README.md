@@ -12,6 +12,8 @@ bundle exec jekyll serve
 - Jekyll 4.2.1
 - Ruby 3.1.0
 - Bundler version 2.3.4
+- libvips v8.12.2
+  - On Windows, you'll need to set the RUBY_DLL_PATH environment variable to point to the libvips bin directory.
 
 ### Contribution
 

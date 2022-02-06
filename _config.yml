@@ -16,6 +16,7 @@ plugins:
   - jekyll-paginate
   - jekyll-coffeescript
   - jekyll-seo-tag
+  - jekyll_picture_tag
 
 exclude:
   - .sass-cache/
