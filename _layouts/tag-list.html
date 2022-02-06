@@ -3,7 +3,13 @@ layout: default
 ---
 
 <div class="tag-list">
-  <h1>Tags:</h1>
+  {% if page.posts.size > 1 %}
+  <h1>There are {{ page.tags.size }} tags</h1>
+  {% else %}
+    <h1>There is {{ page.tags.size }} tag</h1>
+  {% endif %}
+  
+
   <ul>
     {% for tag_posts in page.tags_posts %}
     {% assign tag = tag_posts[0] %}

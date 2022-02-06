@@ -9,30 +9,26 @@ description: |
   {% for post in paginator.posts %}
     {% if post.noindex %}
     {% else %}
-      <div class="wrapper">
-        <section class="front" itemprop="blogPosts" itemscope="" itemtype="http://schema.org/BlogPosting">
-          <article>
-            <div class="subtitle">
-              <h1>
-                <a href="{{ post.url }}">
-                  <span itemprop="name headline mainEntityOfPage">{{ post.title }}</span>
-                </a>
-              </h1>
-              {%- include post-metadata.html -%}
-            </div>
-            <div class="main" itemprop="description">
-              <p>
-                {{ post.excerpt | truncatewords: 70 | remove: '<p>' | remove: '</p>' }}
-              </p>
-            </div>
+      <section class="front" itemprop="blogPosts" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <article>
+          <div class="subtitle">
+            <h1>
+              <a itemprop="name headline mainEntityOfPage" href="{{ post.url }}">{{ post.title }}</a>
+            </h1>
+            {%- include post-metadata.html -%}
+          </div>
+          <div class="main" itemprop="description">
             <p>
-              <a href="{{ post.url }}" itemprop="url">
-                Read...
-              </a>
+              {{ post.excerpt | truncatewords: 70 | remove: '<p>' | remove: '</p>' }}
             </p>
-          </article>
-        </section>
-      </div>
+          </div>
+          <p>
+            <a href="{{ post.url }}" itemprop="url">
+              Read...
+            </a>
+          </p>
+        </article>
+      </section>
     {% endif %}
   {% endfor %}
   </div>
