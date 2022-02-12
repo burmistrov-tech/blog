@@ -32,7 +32,7 @@ picture:
   relative_url: true
   suppress_warnings: false
 
-paginate: 8
+paginate: 5
 paginate_path: "page/:num"
 excerpt_separator: <!--more-->
 

@@ -19,7 +19,7 @@ description: |
           </div>
           <div class="main" itemprop="description">
             <p>
-              {{ post.excerpt | truncatewords: 70 | remove: '<p>' | remove: '</p>' }}
+              {{ post.excerpt | truncatewords: 75 | remove: '<p>' | remove: '</p>' }}
             </p>
           </div>
           <p>
@@ -31,4 +31,15 @@ description: |
       </section>
     {% endif %}
   {% endfor %}
+  <div class="pagination">
+    {% if paginator.previous_page %}
+      <a href="{{ paginator.previous_page_path }}" class="previous"><i class="icon-left-open-big"></i></a>
+    {% endif %}
+    <span class="page_number ">
+      Page {{ paginator.page }} of {{ paginator.total_pages }}
+    </span>
+    {% if paginator.next_page %}
+      <a href="{{ paginator.next_page_path }}" class="next"><i class="icon-right-open-big"></i></a>
+    {% endif %}
   </div>
+</div>
