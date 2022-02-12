@@ -1,0 +1,5 @@
+# see http://rbuchberger.github.io/jekyll_picture_tag/users/presets/
+presets:
+  default:
+    widths: [200, 400, 680]
+    fallback_width: 680

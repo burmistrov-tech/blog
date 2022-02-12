@@ -30,7 +30,7 @@ picture:
   source: assets/images/
   output: generated/
   relative_url: true
-  suppress_warnings: true
+  suppress_warnings: false
 
 paginate: 8
 paginate_path: "page/:num"
