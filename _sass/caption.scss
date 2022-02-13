@@ -1,4 +1,9 @@
+@import 'defenitions';
+
 .caption {
-  margin-left: 20px;
   color: gray;
+
+  @media all and (min-width: $width) {
+    margin-left: 15px;
+  }
 }
