@@ -1,8 +1,8 @@
 module Jekyll
   class CaptionBlock < Liquid::Tag
-    def initialize(tag, raw_params, tokens)
+    def initialize(tag, text, tokens)
       super
-      @text = raw_params
+      @text = text
     end
 
     def render(context)
