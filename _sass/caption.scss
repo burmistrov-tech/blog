@@ -2,8 +2,8 @@
 
 .caption {
   color: gray;
-
-  @media all and (min-width: $width) {
-    margin-left: 15px;
-  }
+  font-size: 0.5 * $em;
+  opacity: 0.6;
+  display: table;
+  margin: 0 auto;
 }
