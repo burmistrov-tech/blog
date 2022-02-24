@@ -10,8 +10,8 @@
 
   @media all and (max-width: $width) {
     line-height: 1.6 * $em;
-    padding-left: $em;
-    padding-right: $em;
+    padding-left: .9 * $em;
+    padding-right: .9 * $em;
     width: 100%;
   }
 }

@@ -1,16 +1,16 @@
 @import 'defenitions';
 
 %list-item {
-  display: inline;
+  display: inline-block;
   text-decoration: none;
-  white-space: nowrap;
 }
 
 .tag {
+  $m: .3 * $em;
   @extend %highlight-color;
   font-family: $code-font;
   font-size: .65 * $em;
-  margin-right: .5 * $em;
+  margin: $m $m $m 0;
   padding: 0 .5 * $em;
   border-radius: 5px;
 }

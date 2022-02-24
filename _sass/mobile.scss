@@ -1,0 +1,7 @@
+@import 'defenitions';
+
+@media (max-width: $width) {
+  .m-hide {
+    display: none !important;
+  }
+}

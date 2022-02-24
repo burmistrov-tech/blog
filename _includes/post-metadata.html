@@ -17,7 +17,7 @@
     {% endcapture %}
     {{ words | plus: 180 | divided_by: 180 | append: ' minutes to read' }}
   </li>
-  <li>
+  <li class="m-hide">
     <i class="icon-comment"></i>
     <a href="{{ site.url }}{{ post.url }}#disqus_thread" itemprop="discussionUrl">comments</a>
   </li>
