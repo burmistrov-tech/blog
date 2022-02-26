@@ -9,8 +9,11 @@
 
   ul {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
     padding: 0 10px 0 10px;
+
+    @media (min-width: $width){ 
+      grid-template-columns: 1fr 1fr 1fr;
+    }
 
     li {
       @extend %list-item;
