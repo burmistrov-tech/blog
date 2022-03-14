@@ -71,3 +71,8 @@ h3 {
     text-decoration: none;
   }
 }
+
+ul {
+  list-style-type: '- ';
+  @extend %primary-font;
+}
