@@ -39,3 +39,8 @@ sass:
   style: compressed
   deploy_style: compressed
   compile_in_place: false
+
+feed:
+  title: http://www.burmistrov.tech
+  subtitle: Nikita Burmistrov | Blog
+  path: rss.xml
