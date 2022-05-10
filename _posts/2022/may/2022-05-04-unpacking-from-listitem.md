@@ -83,8 +83,9 @@ I would rather fail faster with Cast error when testing the method than get unex
 ``` csharp
 var textField = (string) item["TestItemText"];
 var numberField = (double?) item["TestItemNumber"];
-var dateField = (DateTime?) item["TestItemDate"] ?? 
-  new DateTime(2022, 01, 01); // desirable default value
+
+// desirable default value
+var dateField = (DateTime?) item["TestItemDate"] ?? new DateTime(2022, 01, 01);
 ```
 
 Furthermore, we are able to add a little syntactic sugar and simplify obtaining values from the ListItem and implement the TryGet pattern for exception handling.
