@@ -45,10 +45,19 @@ a:visited {
   }
 }
 
+p,
+blockquote,
+ul,
+ol,
+dl,
+table,
+pre,
+details {
+  margin-bottom: 16px;
+}
+
 p {
   font-family: $primary-font;
-  margin-top: 0;
-  margin-bottom: 10px;
 }
 
 h1,
@@ -96,18 +105,6 @@ h5 {
 h6 {
   font-size: .85em;
   color: #57606a;
-}
-
-p,
-blockquote,
-ul,
-ol,
-dl,
-table,
-pre,
-details {
-  margin-top: 0;
-  margin-bottom: 16px;
 }
 
 ul,

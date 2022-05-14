@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Libre+Baskerville:400|JetBrains+Mono:400,500|Ubuntu+Mono:400');
 $black: rgba(41, 41, 41, 1);
 $code-font: 'JetBrains Mono', 'Ubuntu Mono', monospace;
+$small: 85%;
 
 .markdown-body {
   -ms-text-size-adjust: 100%;
@@ -10,7 +11,6 @@ $code-font: 'JetBrains Mono', 'Ubuntu Mono', monospace;
   background-color: #ffffff;
   font-family: $code-font;
   font-size: 16px;
-  line-height: 1.5;
   word-wrap: break-word;
 }
 
@@ -249,8 +249,7 @@ $code-font: 'JetBrains Mono', 'Ubuntu Mono', monospace;
 .markdown-body pre {
   margin-top: 0;
   margin-bottom: 0;
-  font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
-  font-size: 12px;
+  font-family: $code-font;
   word-wrap: normal;
 }
 
@@ -446,18 +445,6 @@ $code-font: 'JetBrains Mono', 'Ubuntu Mono', monospace;
   outline: none;
 }
 
-.markdown-body p,
-.markdown-body blockquote,
-.markdown-body ul,
-.markdown-body ol,
-.markdown-body dl,
-.markdown-body table,
-.markdown-body pre,
-.markdown-body details {
-  margin-top: 0;
-  margin-bottom: 16px;
-}
-
 .markdown-body blockquote>:first-child {
   margin-top: 0;
 }
@@ -572,6 +559,10 @@ $code-font: 'JetBrains Mono', 'Ubuntu Mono', monospace;
 .markdown-body dl dd {
   padding: 0 16px;
   margin-bottom: 16px;
+}
+
+.markdown-body table {
+  font-size: $small;
 }
 
 .markdown-body table th {
@@ -743,7 +734,6 @@ $code-font: 'JetBrains Mono', 'Ubuntu Mono', monospace;
 .markdown-body pre {
   padding: 16px;
   overflow: auto;
-  font-size: 85%;
   line-height: 1.45;
   background-color: #f6f8fa;
   border-radius: 6px;
