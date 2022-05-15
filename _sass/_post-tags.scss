@@ -3,8 +3,8 @@
 ul.post-tags {
   padding: 0;
   line-height: $em;
+}
 
-  li {
-    @extend %list-item;
-  }
+ul.post-tags li {
+  @extend %list-item;
 }

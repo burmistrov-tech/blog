@@ -2,22 +2,22 @@
 
 .tag-list {
   font-size: 0.85 * $em;
+}
 
-  h2 {
-    margin: 15px 0 10px 0;
-  }
+.tag-list h2 {
+  margin: 15px 0 10px 0;
+}
 
-  ul {
-    display: grid;
+.tag-list ul {
+  display: grid;
     padding: 0 10px 0 10px;
 
-    @media (min-width: $width){ 
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-
-    li {
-      @extend %list-item;
-      margin: 0.2em;
-    }
+  @media (min-width: $width){ 
+    grid-template-columns: 1fr 1fr 1fr;
   }
+}
+
+.tag-list ul li {
+  @extend %list-item;
+  margin: 0.2em;
 }
