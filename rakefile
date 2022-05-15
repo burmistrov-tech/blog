@@ -1,0 +1,28 @@
+require 'rake'
+require 'English'
+
+task default: [
+  :clean,
+  :build
+]
+
+def success(msg)
+  puts msg + "\n"
+end
+
+desc 'Clean jekyll _site'
+task :clean do
+  if File.exist? '_site'
+    puts 'Cleaning Jekyll site...'
+    system('jekyll clean --trace')
+    success 'Jekyll temporary files and directories deleted'
+  end
+end
+
+desc 'Build Jekyll site'
+task :build do
+  puts 'Building Jekyll site...'
+  system('jekyll build --trace')
+  fail "Jekyll failed with #{$CHILD_STATUS}" unless $CHILD_STATUS.success?
+  success 'Jekyll site generated without any issue'
+end

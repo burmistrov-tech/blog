@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://burmistrov-tech.github.io/blog/rss.xml" rel="self" type="application/atom+xml" /><link href="https://burmistrov-tech.github.io/blog/" rel="alternate" type="text/html" /><updated>2022-05-15T23:39:38+02:00</updated><id>https://burmistrov-tech.github.io/blog/rss.xml</id><title type="html">Nikita Burmistrov</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><entry><title type="html">How to Handle ListItem Properties?</title><link href="https://burmistrov-tech.github.io/blog/2022/05/15/unpacking-from-listitem.html" rel="alternate" type="text/html" title="How to Handle ListItem Properties?" /><published>2022-05-15T00:00:00+02:00</published><updated>2022-05-15T00:00:00+02:00</updated><id>https://burmistrov-tech.github.io/blog/2022/05/15/unpacking-from-listitem</id><content type="html" xml:base="https://burmistrov-tech.github.io/blog/2022/05/15/unpacking-from-listitem.html"><![CDATA[<p>During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with <em>Microsoft.SharePoint.Client</em> library.</p>
+
+<p>One of the most popular tasks is to get an item from a list and get its fields then. Let’s look at the situation of obtaining fields of the ListItem object.</p>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="p">(</span><span class="kt">var</span> <span class="n">context</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">ClientContext</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+<span class="p">{</span>
+  <span class="n">List</span> <span class="n">list</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">Web</span><span class="p">.</span><span class="nf">GetList</span><span class="p">(</span><span class="s">"Lists/items"</span><span class="p">);</span>
+  <span class="n">ListItem</span> <span class="n">item</span> <span class="p">=</span> <span class="n">list</span><span class="p">.</span><span class="nf">GetItemById</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+
+  <span class="n">context</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="n">item</span><span class="p">);</span>
+  <span class="n">context</span><span class="p">.</span><span class="nf">ExecuteQuery</span><span class="p">();</span>
+  
+  <span class="c1">// Here is the problem</span>
+  <span class="kt">string</span> <span class="n">textField</span> <span class="p">=</span>  <span class="n">Convert</span><span class="p">.</span><span class="nf">ToString</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s">"TestItemText"</span><span class="p">]);</span>
+  <span class="kt">double</span> <span class="n">numberField</span> <span class="p">=</span> <span class="n">Convert</span><span class="p">.</span><span class="nf">ToDouble</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s">"TestItemNumber"</span><span class="p">]);</span>
+  <span class="n">DateTime</span> <span class="n">dateField</span> <span class="p">=</span> <span class="n">Convert</span><span class="p">.</span><span class="nf">ToDateTime</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s">"TestItemDate"</span><span class="p">]);</span>
+
+  <span class="k">return</span> <span class="k">new</span> <span class="p">{</span> <span class="n">Text</span> <span class="p">=</span> <span class="n">textField</span><span class="p">,</span> <span class="n">Number</span> <span class="p">=</span> <span class="n">numberField</span> <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<blockquote>
+  <p>Static methods are like the cancer of object-oriented programming software: once we let them settle in our code, we cannot get rid of them - their colony will only grow. Just avoid them in principle.</p>
+</blockquote>
+
+<p>You may not believe me, but this is the most common way of obtaining values that I have encountered. The problem here is that we already know what type to expect in the <em>ListItem</em>, based on the type we set in the settings of our List. The relation of .NET types to field types in SharePoint is below.</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>C# Type</td>
+      <td>SharePoint Type</td>
+    </tr>
+    <tr>
+      <td>string</td>
+      <td>Text, Note, Choice</td>
+    </tr>
+    <tr>
+      <td>double?</td>
+      <td>Number</td>
+    </tr>
+    <tr>
+      <td>decimal?</td>
+      <td>Currency</td>
+    </tr>
+    <tr>
+      <td>DateTime?</td>
+      <td>Date and time</td>
+    </tr>
+    <tr>
+      <td>bool?</td>
+      <td>Boolean</td>
+    </tr>
+    <tr>
+      <td>FieldUserValue</td>
+      <td>User or Group</td>
+    </tr>
+    <tr>
+      <td>FieldLookupValue</td>
+      <td>Lookup</td>
+    </tr>
+    <tr>
+      <td>FieldUrlValue</td>
+      <td>File or URL</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>As you can see, all fields allow null values. We will have different results in case null value, if we use a <em>static class Convert</em> and if we use a usual unpacking.</p>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// is true</span>
+<span class="kt">bool</span> <span class="n">isNull</span> <span class="p">=</span> <span class="n">item</span><span class="p">[</span><span class="s">"TestItemText"</span><span class="p">]</span> <span class="p">==</span> <span class="k">null</span><span class="p">;</span> 
+
+<span class="c1">// string.Empty</span>
+<span class="kt">string</span> <span class="n">convertedText</span> <span class="p">=</span> <span class="n">Convert</span><span class="p">.</span><span class="nf">ToString</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s">"TestItemText"</span><span class="p">]);</span> 
+
+<span class="c1">// null</span>
+<span class="kt">string</span> <span class="n">castedText</span> <span class="p">=</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="n">item</span><span class="p">[</span><span class="s">"TestItemText"</span><span class="p">];</span>
+</code></pre></div></div>
+<p>To explain this behavior, we need to look at the source code of the <em>Convert.ToString</em> method.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">__DynamicallyInvokable</span><span class="p">]</span>
+<span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">ToString</span><span class="p">(</span><span class="kt">object</span> <span class="k">value</span><span class="p">)</span> <span class="p">=&gt;</span>
+  <span class="n">Convert</span><span class="p">.</span><span class="nf">ToString</span><span class="p">(</span><span class="k">value</span><span class="p">,</span> <span class="p">(</span><span class="n">IFormatProvider</span><span class="p">)</span> <span class="k">null</span><span class="p">);</span>
+
+<span class="p">[</span><span class="n">__DynamicallyInvokable</span><span class="p">]</span>
+<span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">ToString</span><span class="p">(</span><span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">IFormatProvider</span> <span class="n">provider</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">switch</span> <span class="p">(</span><span class="k">value</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">case</span> <span class="n">IConvertible</span> <span class="n">convertible</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">convertible</span><span class="p">.</span><span class="nf">ToString</span><span class="p">(</span><span class="n">provider</span><span class="p">);</span>
+    <span class="k">case</span> <span class="n">IFormattable</span> <span class="n">formattable</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">formattable</span><span class="p">.</span><span class="nf">ToString</span><span class="p">((</span><span class="kt">string</span><span class="p">)</span> <span class="k">null</span><span class="p">,</span> <span class="n">provider</span><span class="p">);</span>
+    <span class="c1">// in that case</span>
+    <span class="k">case</span> <span class="k">null</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">;</span>
+    <span class="k">default</span><span class="p">:</span>
+      <span class="k">return</span> <span class="k">value</span><span class="p">.</span><span class="nf">ToString</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="fail-fast-and-fail-safe">Fail Fast and Fail Safe</h2>
+
+<p>I would rather fail faster with Cast error when testing the method than get unexpected values somewhere in other services. If we have made sure with SharePoint types, we can simply convert the object type to the desired value type. Just don’t forget to set a nullable value type or set a desirable default value, in case of null.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">textField</span> <span class="p">=</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="n">item</span><span class="p">[</span><span class="s">"TestItemText"</span><span class="p">];</span>
+<span class="kt">var</span> <span class="n">numberField</span> <span class="p">=</span> <span class="p">(</span><span class="kt">double</span><span class="p">?)</span> <span class="n">item</span><span class="p">[</span><span class="s">"TestItemNumber"</span><span class="p">];</span>
+
+<span class="c1">// desirable default value</span>
+<span class="kt">var</span> <span class="n">dateField</span> <span class="p">=</span> <span class="p">(</span><span class="n">DateTime</span><span class="p">?)</span> <span class="n">item</span><span class="p">[</span><span class="s">"TestItemDate"</span><span class="p">]</span> <span class="p">??</span> <span class="k">new</span> <span class="nf">DateTime</span><span class="p">(</span><span class="m">2022</span><span class="p">,</span> <span class="m">01</span><span class="p">,</span> <span class="m">01</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Furthermore, we are able to add a little syntactic sugar and simplify obtaining values from the ListItem and implement the TryGet pattern for exception handling.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Extensions</span>
+<span class="p">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="n">T</span> <span class="n">GetFieldValue</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="k">this</span> <span class="n">ListItem</span> <span class="n">item</span><span class="p">,</span> <span class="kt">string</span> <span class="n">fieldName</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="n">item</span><span class="p">[</span><span class="n">fieldName</span><span class="p">];</span>
+  <span class="p">};</span>
+
+  <span class="k">public</span> <span class="k">static</span> <span class="kt">bool</span> <span class="n">TryGetFieldValue</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="k">this</span> <span class="n">ListItem</span> <span class="n">item</span><span class="p">,</span> <span class="kt">string</span> <span class="n">fieldName</span><span class="p">,</span> <span class="k">out</span> <span class="n">T</span> <span class="k">value</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">value</span> <span class="p">=</span> <span class="k">default</span><span class="p">;</span> 
+    
+    <span class="k">try</span>
+    <span class="p">{</span>
+        <span class="k">value</span> <span class="p">=</span> <span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="n">item</span><span class="p">[</span><span class="n">fieldName</span><span class="p">];</span>
+
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">catch</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">var</span> <span class="n">textField</span> <span class="p">=</span> <span class="n">item</span><span class="p">.</span><span class="n">GetFieldValue</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;(</span><span class="s">"TestItemText"</span><span class="p">);</span>
+<span class="kt">var</span> <span class="n">numberField</span> <span class="p">=</span> <span class="n">item</span><span class="p">.</span><span class="n">GetFieldValue</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">?&gt;(</span><span class="s">"TestItemNumber"</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">item</span><span class="p">.</span><span class="n">TryGetFieldValue</span><span class="p">&lt;</span><span class="n">DateTime</span><span class="p">&gt;(</span><span class="s">"TestItemDate"</span><span class="p">,</span> <span class="k">out</span> <span class="kt">var</span> <span class="n">dateField</span><span class="p">))</span>
+<span class="p">{</span>
+  <span class="n">_logger</span><span class="p">.</span><span class="nf">LogInformation</span><span class="p">(</span><span class="s">"Unexpected null value or type error with TestItemDate field"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Agree, it looks much nicer than before.</p>
+
+<h2 id="what-else-can-be-improved">What else can be improved?</h2>
+
+<p>The solution that we considered fits perfectly with the Rich Domain Model in small projects where we don’t always need to do mapping of SharePoint entities and domain entities. But in large projects, we have to deal with a large number of entities and the process of manual mapping becomes not the most optimal solution.
+I have ideas about developing automatic mapping for SharePoint entities similar to <em>System.Text.Json Serializer</em>.</p>
+
+<p>What do you think, will it be useful?</p>]]></content><author><name></name></author><category term="csharp" /><category term="sharepoint" /><summary type="html"><![CDATA[During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with Microsoft.SharePoint.Client library. One of the most popular tasks is to get an item from a list and get its fields then. Let’s look at the situation of obtaining fields of the ListItem object. using (var context = new ClientContext(url)) { List list = context.Web.GetList("Lists/items"); ListItem item = list.GetItemById(1); context.Load(item); context.ExecuteQuery(); // Here is the problem string textField = Convert.ToString(item["TestItemText"]); double numberField = Convert.ToDouble(item["TestItemNumber"]); DateTime dateField = Convert.ToDateTime(item["TestItemDate"]); return new { Text = textField, Number = numberField }; } Static methods are like the cancer of object-oriented programming software: once we let them settle in our code, we cannot get rid of them - their colony will only grow. Just avoid them in principle. You may not believe me, but this is the most common way of obtaining values that I have encountered. The problem here is that we already know what type to expect in the ListItem, based on the type we set in the settings of our List. The relation of .NET types to field types in SharePoint is below. C# Type SharePoint Type string Text, Note, Choice double? Number decimal? Currency DateTime? Date and time bool? Boolean FieldUserValue User or Group FieldLookupValue Lookup FieldUrlValue File or URL As you can see, all fields allow null values. We will have different results in case null value, if we use a static class Convert and if we use a usual unpacking. // is true bool isNull = item["TestItemText"] == null; // string.Empty string convertedText = Convert.ToString(item["TestItemText"]); // null string castedText = (string) item["TestItemText"]; To explain this behavior, we need to look at the source code of the Convert.ToString method. [__DynamicallyInvokable] public static string ToString(object value) =&gt; Convert.ToString(value, (IFormatProvider) null); [__DynamicallyInvokable] public static string ToString(object value, IFormatProvider provider) { switch (value) { case IConvertible convertible: return convertible.ToString(provider); case IFormattable formattable: return formattable.ToString((string) null, provider); // in that case case null: return string.Empty; default: return value.ToString(); } } Fail Fast and Fail Safe I would rather fail faster with Cast error when testing the method than get unexpected values somewhere in other services. If we have made sure with SharePoint types, we can simply convert the object type to the desired value type. Just don’t forget to set a nullable value type or set a desirable default value, in case of null. var textField = (string) item["TestItemText"]; var numberField = (double?) item["TestItemNumber"]; // desirable default value var dateField = (DateTime?) item["TestItemDate"] ?? new DateTime(2022, 01, 01); Furthermore, we are able to add a little syntactic sugar and simplify obtaining values from the ListItem and implement the TryGet pattern for exception handling. public static class Extensions { public static T GetFieldValue&lt;T&gt;(this ListItem item, string fieldName) { return (T) item[fieldName]; }; public static bool TryGetFieldValue&lt;T&gt;(this ListItem item, string fieldName, out T value) { value = default; try { value = (T) item[fieldName]; return true; } catch { return false; } } } var textField = item.GetFieldValue&lt;string&gt;("TestItemText"); var numberField = item.GetFieldValue&lt;double?&gt;("TestItemNumber"); if (item.TryGetFieldValue&lt;DateTime&gt;("TestItemDate", out var dateField)) { _logger.LogInformation("Unexpected null value or type error with TestItemDate field"); } Agree, it looks much nicer than before. What else can be improved? The solution that we considered fits perfectly with the Rich Domain Model in small projects where we don’t always need to do mapping of SharePoint entities and domain entities. But in large projects, we have to deal with a large number of entities and the process of manual mapping becomes not the most optimal solution. I have ideas about developing automatic mapping for SharePoint entities similar to System.Text.Json Serializer. What do you think, will it be useful?]]></summary></entry></feed>
