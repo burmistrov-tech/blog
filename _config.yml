@@ -5,7 +5,7 @@ description: >-
   line in _config.yml. It will appear in your document head meta (for
   Google search results) and in your feed.xml site description.
 
-url: "http://www.burmistrov.tech" 
+url: "https://www.burmistrov.tech" 
 linkedin_username: burmistrov-tech
 github_username:  burmistrov-tech
 telegram_username: burmistrov_tech
@@ -41,6 +41,6 @@ sass:
   compile_in_place: false
 
 feed:
-  title: http://www.burmistrov.tech
+  title: https://www.burmistrov.tech
   subtitle: Nikita Burmistrov | Blog
   path: rss.xml
