@@ -1,10 +1,10 @@
 ---
 layout: post
-title: "The best way to access SP ListItem"
-date: 2022-05-04
+title: "How to Handle ListItem Properties?"
+date: 2022-05-15
 tags: |
-  oop
   csharp
+  sharepoint
 ---
 
 During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with _Microsoft.SharePoint.Client_ library.
@@ -56,8 +56,8 @@ To explain this behavior, we need to look at the source code of the _Convert.ToS
 
 ``` csharp
 [__DynamicallyInvokable]
-public static string ToString(object value) => 
-	Convert.ToString(value, (IFormatProvider) null);
+public static string ToString(object value) =>
+  Convert.ToString(value, (IFormatProvider) null);
 
 [__DynamicallyInvokable]
 public static string ToString(object value, IFormatProvider provider)
@@ -93,30 +93,33 @@ Furthermore, we are able to add a little syntactic sugar and simplify obtaining 
 ``` csharp
 public static class Extensions
 {
-    public static T GetFieldValue<T>(this ListItem item, string fieldName) => (T) item[fieldName];
+  public static T GetFieldValue<T>(this ListItem item, string fieldName)
+  {
+    return (T) item[fieldName];
+  };
 
-    public static bool TryGetFieldValue<T>(this ListItem item, string fieldName, out T value)
+  public static bool TryGetFieldValue<T>(this ListItem item, string fieldName, out T value)
+  {
+    value = default; 
+    
+    try
     {
-        value = default; 
-        
-        try
-        {
-            value = (T) item[fieldName];
+        value = (T) item[fieldName];
 
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+        return true;
     }
+    catch
+    {
+        return false;
+    }
+  }
 }
 
 var textField = item.GetFieldValue<string>("TestItemText");
 var numberField = item.GetFieldValue<double?>("TestItemNumber");
 if (item.TryGetFieldValue<DateTime>("TestItemDate", out var dateField))
 {
-    _logger.LogInformation("Unexpected null value or type error with TestItemDate field");
+  _logger.LogInformation("Unexpected null value or type error with TestItemDate field");
 }
 ```
 Agree, it looks much nicer than before.
