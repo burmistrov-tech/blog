@@ -6,9 +6,9 @@ description: >-
   Google search results) and in your feed.xml site description.
 
 url: "https://burmistrov-tech.github.io/blog" 
-linkedin_username: nburmistrov
-github_username:  nburmistrov
-telegram_username: nburmistrov
+linkedin_username: burmistrov-tech
+github_username:  burmistrov-tech
+telegram_username: burmistrov_tech
 
 plugins:
   - jekyll-feed
