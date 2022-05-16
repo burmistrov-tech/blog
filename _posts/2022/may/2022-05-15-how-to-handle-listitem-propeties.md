@@ -9,6 +9,8 @@ tags: |
 
 During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with _Microsoft.SharePoint.Client_ library.
 
+{% picture back-to-the-future.jpg %} {% caption Back to the Future (1985) %}
+
 One of the most popular tasks is to get an item from a list and get its fields then. Let's look at the situation of obtaining fields of the ListItem object.
 ``` csharp
 using (var context = new ClientContext(url))
