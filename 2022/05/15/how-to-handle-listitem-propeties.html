@@ -55,7 +55,7 @@
     </time>
   </li>
   <li itemprop="wordCount">
-    1080 words
+    1096 words
   </li>
   <li>
     
@@ -63,7 +63,7 @@
   </li>
   <li class="m-hide">
     <i class="icon-comment"></i>
-    <a href="https://www.burmistrov.tech/2022/05/15/unpacking-from-listitem.html#disqus_thread" itemprop="discussionUrl"></a>
+    <a href="https://www.burmistrov.tech/2022/05/15/how-to-handle-listitem-propeties.html#disqus_thread" itemprop="discussionUrl"></a>
   </li>
 </ul>
 
@@ -72,6 +72,9 @@
   </ul>
 </div>
   <p>During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with <em>Microsoft.SharePoint.Client</em> library.</p>
+
+<p><img src="/generated/back-to-the-future-680-03146d8e0.jpg" srcset="/generated/back-to-the-future-200-03146d8e0.jpg 200w, /generated/back-to-the-future-400-03146d8e0.jpg 400w, /generated/back-to-the-future-680-03146d8e0.jpg 680w" />
+ <span class="caption">Back to the Future (1985) </span></p>
 
 <p>One of the most popular tasks is to get an item from a list and get its fields then. Let’s look at the situation of obtaining fields of the ListItem object.</p>
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="p">(</span><span class="kt">var</span> <span class="n">context</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">ClientContext</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
