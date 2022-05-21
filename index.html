@@ -19,8 +19,7 @@ description: |
           </div>
           <div class="main" itemprop="description">
             <p>
-              {% assign content = post.excerpt | split: '<img' %}
-              {{ content[0] | truncatewords: 75 | remove: '<p>' | remove: '</p>' }}
+              {{ post.excerpt | prepare_description | truncatewords: 75 }}
             </p>
           </div>
           <p>

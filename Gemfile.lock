@@ -65,10 +65,13 @@ GEM
     mime-types (3.4.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2022.0105)
+    nokogiri (1.13.6-x64-mingw-ucrt)
+      racc (~> 1.4)
     objective_elements (1.1.2)
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
     public_suffix (4.0.6)
+    racc (1.6.0)
     rainbow (3.1.1)
     rb-fsevent (0.11.1)
     rb-inotify (0.10.1)
@@ -95,6 +98,7 @@ DEPENDENCIES
   jekyll-paginate
   jekyll-seo-tag
   jekyll_picture_tag (~> 2.0)
+  nokogiri (~> 1.13.6)
   tzinfo (~> 1.2)
   tzinfo-data
   wdm (~> 0.1.1)
