@@ -7,7 +7,7 @@ tags: |
   sharepoint
 ---
 
-During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with _Microsoft.SharePoint.Client_ library.
+During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with `Microsoft.SharePoint.Client` library.
 
 {% picture back-to-the-future.jpg %} {% caption Back to the Future (1985) %}
 
@@ -31,7 +31,7 @@ using (var context = new ClientContext(url))
 ```
 > Static methods are like the cancer of object-oriented programming software: once we let them settle in our code, we cannot get rid of them - their colony will only grow. Just avoid them in principle.
 
-You may not believe me, but this is the most common way of obtaining values that I have encountered. The problem here is that we already know what type to expect in the _ListItem_, based on the type we set in the settings of our List. The relation of .NET types to field types in SharePoint is below.
+You may not believe me, but this is the most common way of obtaining values that I have encountered. The problem here is that we already know what type to expect in the `ListItem`, based on the type we set in the settings of our List. The relation of .NET types to field types in SharePoint is below.
 
 | C# Type          | SharePoint Type    |
 | string           | Text, Note, Choice |
@@ -43,7 +43,7 @@ You may not believe me, but this is the most common way of obtaining values that
 | FieldLookupValue | Lookup             |
 | FieldUrlValue    | File or URL        |
 
-As you can see, all fields allow null values. We will have different results in case null value, if we use a _static class Convert_ and if we use a usual unpacking. 
+As you can see, all fields allow null values. We will have different results in case null value, if we use a static class `Convert` and if we use a usual unpacking. 
 ``` csharp
 // is true
 bool isNull = item["TestItemText"] == null; 
@@ -54,7 +54,7 @@ string convertedText = Convert.ToString(item["TestItemText"]);
 // null
 string castedText = (string) item["TestItemText"];
 ```
-To explain this behavior, we need to look at the source code of the _Convert.ToString_ method.
+To explain this behavior, we need to look at the source code of the `Convert.ToString` method.
 
 ``` csharp
 [__DynamicallyInvokable]
@@ -129,6 +129,6 @@ Agree, it looks much nicer than before.
 ## What else can be improved?
 
 The solution that we considered fits perfectly with the Rich Domain Model in small projects where we don't always need to do mapping of SharePoint entities and domain entities. But in large projects, we have to deal with a large number of entities and the process of manual mapping becomes not the most optimal solution.
-I have ideas about developing automatic mapping for SharePoint entities similar to _System.Text.Json Serializer_. 
+I have ideas about developing automatic mapping for SharePoint entities similar to `System.Text.Json Serializer`.
 
 What do you think, will it be useful?
