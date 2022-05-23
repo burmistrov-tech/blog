@@ -1,4 +1,181 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://www.burmistrov.tech/rss.xml" rel="self" type="application/atom+xml" /><link href="https://www.burmistrov.tech/" rel="alternate" type="text/html" /><updated>2022-05-16T21:13:31+02:00</updated><id>https://www.burmistrov.tech/rss.xml</id><title type="html">Nikita Burmistrov</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><entry><title type="html">How to Handle ListItem Properties?</title><link href="https://www.burmistrov.tech/2022/05/15/how-to-handle-listitem-propeties.html" rel="alternate" type="text/html" title="How to Handle ListItem Properties?" /><published>2022-05-15T00:00:00+02:00</published><updated>2022-05-15T00:00:00+02:00</updated><id>https://www.burmistrov.tech/2022/05/15/how-to-handle-listitem-propeties</id><content type="html" xml:base="https://www.burmistrov.tech/2022/05/15/how-to-handle-listitem-propeties.html"><![CDATA[<p>During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with <em>Microsoft.SharePoint.Client</em> library.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://www.burmistrov.tech/rss.xml" rel="self" type="application/atom+xml" /><link href="https://www.burmistrov.tech/" rel="alternate" type="text/html" /><updated>2022-05-23T02:03:14+02:00</updated><id>https://www.burmistrov.tech/rss.xml</id><title type="html">Nikita Burmistrov</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><entry><title type="html">Use Microsoft Dependency Injection in your ASP.NET Web project</title><link href="https://www.burmistrov.tech/2022/05/23/use-microsoft-di-in-aspnet.html" rel="alternate" type="text/html" title="Use Microsoft Dependency Injection in your ASP.NET Web project" /><published>2022-05-23T00:00:00+02:00</published><updated>2022-05-23T00:00:00+02:00</updated><id>https://www.burmistrov.tech/2022/05/23/use-microsoft-di-in-aspnet</id><content type="html" xml:base="https://www.burmistrov.tech/2022/05/23/use-microsoft-di-in-aspnet.html"><![CDATA[<p>If you have been “lucky” enough to work with the ASP.NET Web project, then most likely you have had experience with different dependency injection libraries. For a long time Unity, Autofac, Ninject, and others have successfully covered dependency injection needs, each of them supports ASP.NET Web and provide their own IoC containers that have a quite comfortable API to work with (except Unity, it is terrible), but there is still one little problem.</p>
+
+<p><img src="/generated/hot-fuzz-2007-680-737db6c11.jpg" srcset="/generated/hot-fuzz-2007-200-737db6c11.jpg 200w, /generated/hot-fuzz-2007-400-737db6c11.jpg 400w, /generated/hot-fuzz-2007-680-737db6c11.jpg 680w" />
+ <span class="caption">Hot Fuzz (2007) </span></p>
+
+<p>The arrival of ASP.NET Core and with it <code class="language-plaintext highlighter-rouge">Microsoft.Extensions.DependencyInjection</code> set a new standard in dependency injection. Every modern solution now focuses on Microsoft DI and provides extension methods compatible with <code class="language-plaintext highlighter-rouge">IServiceCollection</code>. For example, if you want to use <a href="https://github.com/serilog/serilog-extensions-logging">Serilog</a> in your solution, you can achieve this with a few lines of code.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">ServiceCollection</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="nf">AddLogging</span><span class="p">(</span><span class="n">builder</span> <span class="p">=&gt;</span> <span class="n">builder</span><span class="p">.</span><span class="nf">AddSerilog</span><span class="p">(</span><span class="n">logger</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>But unfortunately, Microsoft DI doesn’t implement <code class="language-plaintext highlighter-rouge">IDependencyResolver</code> out of the box, which is the interface ASP.NET Web uses to resolve dependencies. Below, I’ll show you how to implement this interface yourself, but first, let’s look at it.</p>
+
+<h2 id="under-the-hood">Under the hood</h2>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">namespace</span> <span class="nn">System.Web.Http.Dependencies</span>
+<span class="p">{</span>
+  <span class="c1">/// &lt;summary&gt;Represents a dependency injection container.&lt;/summary&gt;</span>
+  <span class="k">public</span> <span class="k">interface</span> <span class="nc">IDependencyResolver</span> <span class="p">:</span> <span class="n">IDependencyScope</span><span class="p">,</span> <span class="n">IDisposable</span>
+  <span class="p">{</span>
+    <span class="c1">/// &lt;summary&gt; Starts a resolution scope. &lt;/summary&gt;</span>
+    <span class="c1">/// &lt;returns&gt;The dependency scope.&lt;/returns&gt;</span>
+    <span class="n">IDependencyScope</span> <span class="nf">BeginScope</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="c1">/// &lt;summary&gt;Represents an interface for the range of the dependencies.&lt;/summary&gt;</span>
+  <span class="k">public</span> <span class="k">interface</span> <span class="nc">IDependencyScope</span> <span class="p">:</span> <span class="n">IDisposable</span>
+  <span class="p">{</span>
+    <span class="c1">/// &lt;summary&gt;Retrieves a service from the scope.&lt;/summary&gt;</span>
+    <span class="c1">/// &lt;returns&gt;The retrieved service.&lt;/returns&gt;</span>
+    <span class="c1">/// &lt;param name="serviceType"&gt;The service to be retrieved.&lt;/param&gt;</span>
+    <span class="kt">object</span> <span class="nf">GetService</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">);</span>
+
+    <span class="c1">/// &lt;summary&gt;Retrieves a collection of services from the scope.&lt;/summary&gt;</span>
+    <span class="c1">/// &lt;returns&gt;The retrieved collection of services.&lt;/returns&gt;</span>
+    <span class="c1">/// &lt;param name="serviceType"&gt;The collection of services to be retrieved.&lt;/param&gt;</span>
+    <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="kt">object</span><span class="p">&gt;</span> <span class="nf">GetServices</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If we compare <code class="language-plaintext highlighter-rouge">IServiceProvider</code> and <code class="language-plaintext highlighter-rouge">IDependencyResolver</code>, they are generally similar. Except that <code class="language-plaintext highlighter-rouge">IServiceProvider</code> contains generic overloaded methods and asynchronous scoping. Therefore, all we need is to make them compatible to convert one interface to the other.</p>
+
+<h2 id="adapting-iserviceprovider-to-idependencyresolver">Adapting IServiceProvider to IDependencyResolver</h2>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">DependencyInjectionResolver</span> <span class="p">:</span> <span class="n">IDependencyResolver</span><span class="p">,</span> <span class="n">IServiceProvider</span><span class="p">,</span> <span class="n">IAsyncDisposable</span>
+<span class="p">{</span>
+  <span class="k">private</span> <span class="k">readonly</span> <span class="n">IServiceProvider</span> <span class="n">_serviceProvider</span><span class="p">;</span>
+  <span class="k">private</span> <span class="kt">bool</span> <span class="n">_disposed</span><span class="p">;</span>
+
+  <span class="k">public</span> <span class="nf">DependencyInjectionResolver</span><span class="p">(</span><span class="n">IServiceProvider</span> <span class="n">serviceProvider</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">_serviceProvider</span> <span class="p">=</span> <span class="n">serviceProvider</span> <span class="p">??</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">serviceProvider</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="n">IDependencyScope</span> <span class="nf">BeginScope</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="kt">var</span> <span class="n">scope</span> <span class="p">=</span> <span class="n">_serviceProvider</span><span class="p">.</span><span class="nf">CreateScope</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">DependencyInjectionResolver</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="n">ServiceProvider</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="kt">object</span> <span class="nf">GetService</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">serviceType</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">serviceType</span><span class="p">));</span>
+    
+    <span class="k">return</span> <span class="n">_serviceProvider</span><span class="p">.</span><span class="nf">GetService</span><span class="p">(</span><span class="n">serviceType</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="kt">object</span><span class="p">&gt;</span> <span class="nf">GetServices</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">serviceType</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">serviceType</span><span class="p">));</span>
+    
+    <span class="k">return</span> <span class="n">_serviceProvider</span><span class="p">.</span><span class="nf">GetServices</span><span class="p">(</span><span class="n">serviceType</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="k">void</span> <span class="nf">Dispose</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_disposed</span> <span class="p">||</span> <span class="p">!(</span><span class="n">_serviceProvider</span> <span class="k">is</span> <span class="n">IDisposable</span> <span class="n">disposable</span><span class="p">))</span> <span class="k">return</span><span class="p">;</span>
+    
+    <span class="n">_disposed</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+    <span class="n">disposable</span><span class="p">.</span><span class="nf">Dispose</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="n">ValueTask</span> <span class="nf">DisposeAsync</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_disposed</span><span class="p">)</span> <span class="k">return</span> <span class="k">default</span><span class="p">;</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="n">_serviceProvider</span> <span class="k">is</span> <span class="n">IAsyncDisposable</span> <span class="n">asyncDisposable</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">_disposed</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">asyncDisposable</span><span class="p">.</span><span class="nf">DisposeAsync</span><span class="p">();</span>
+    <span class="p">}</span>
+    
+    <span class="nf">Dispose</span><span class="p">();</span>
+    
+    <span class="k">return</span> <span class="k">default</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The implementation is quite simple, <code class="language-plaintext highlighter-rouge">IServiceProvider</code> passes in the constructor delegated to retrieve services and being (create) scopes.</p>
+<ul>
+  <li>We implement <code class="language-plaintext highlighter-rouge">IServiceProvider</code> itself to work with <code class="language-plaintext highlighter-rouge">DependencyInjectionResolver</code> in the same way as the <code class="language-plaintext highlighter-rouge">ServiceProvider</code> itself using extension methods</li>
+  <li>We implement <code class="language-plaintext highlighter-rouge">IDisposable</code> and <code class="language-plaintext highlighter-rouge">IAsyncDisposable</code> in case we need to release resources from the scope</li>
+</ul>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">ServiceCollectionExtensions</span>
+<span class="p">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="n">IServiceCollection</span> <span class="nf">AddWebApiControllers</span><span class="p">(</span><span class="k">this</span> <span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">services</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">services</span><span class="p">));</span>
+
+    <span class="kt">var</span> <span class="n">controllers</span> <span class="p">=</span> <span class="n">Assembly</span><span class="p">.</span><span class="nf">GetExecutingAssembly</span><span class="p">().</span><span class="n">ExportedTypes</span>
+      <span class="p">.</span><span class="nf">Where</span><span class="p">(</span><span class="n">t</span> <span class="p">=&gt;</span> <span class="p">!</span><span class="n">t</span><span class="p">.</span><span class="n">IsAbstract</span> <span class="p">&amp;&amp;</span> <span class="p">!</span><span class="n">t</span><span class="p">.</span><span class="n">IsGenericTypeDefinition</span><span class="p">)</span>
+      <span class="p">.</span><span class="nf">Where</span><span class="p">(</span><span class="n">t</span> <span class="p">=&gt;</span> <span class="k">typeof</span><span class="p">(</span><span class="n">IHttpController</span><span class="p">).</span><span class="nf">IsAssignableFrom</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="p">||</span> <span class="n">t</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="nf">EndsWith</span><span class="p">(</span><span class="s">"Controller"</span><span class="p">,</span> <span class="n">StringComparison</span><span class="p">.</span><span class="n">OrdinalIgnoreCase</span><span class="p">));</span>
+
+    <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">controller</span> <span class="k">in</span> <span class="n">controllers</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">services</span><span class="p">.</span><span class="nf">AddTransient</span><span class="p">(</span><span class="n">controller</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">services</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="k">static</span> <span class="n">DependencyInjectionResolver</span> <span class="nf">ToDependencyResolver</span><span class="p">(</span><span class="k">this</span> <span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">services</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">services</span><span class="p">));</span>
+    
+    <span class="kt">var</span> <span class="n">serviceProvider</span> <span class="p">=</span> <span class="n">services</span><span class="p">.</span><span class="nf">BuildServiceProvider</span><span class="p">();</span>
+    
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">DependencyInjectionResolver</span><span class="p">(</span><span class="n">serviceProvider</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In addition, two extension methods will help us:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">AddWebApiControllers</code> registeres controllers as <em>Transient</em>, otherwise there will be a runtime error</li>
+  <li><code class="language-plaintext highlighter-rouge">DependencyInjectionResolver</code> allows us simply build a service prvoider and create a new instance of <code class="language-plaintext highlighter-rouge">DependencyInjectionResolver</code></li>
+</ul>
+
+<h2 id="how-to-use-dependencyinjectionresolver">How to use DependencyInjectionResolver</h2>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">HttpConfigurationExtensions</span>
+<span class="p">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">AddDependencyInjection</span><span class="p">(</span><span class="k">this</span> <span class="n">HttpConfiguration</span> <span class="n">httpConfiguration</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">ServiceCollection</span><span class="p">();</span>
+
+    <span class="n">container</span>
+      <span class="p">.</span><span class="nf">AddWebApiControllers</span><span class="p">()</span>
+      <span class="p">.</span><span class="n">AddSingleton</span><span class="p">&lt;</span><span class="n">IServiceOne</span><span class="p">,</span> <span class="n">ServiceOne</span><span class="p">&gt;()</span>
+      <span class="p">.</span><span class="n">AddSingleton</span><span class="p">&lt;</span><span class="n">IServiceTwo</span><span class="p">,</span> <span class="n">ServiceTwo</span><span class="p">&gt;();</span>
+
+    <span class="n">httpConfiguration</span><span class="p">.</span><span class="n">DependencyResolver</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="nf">ToDependencyResolver</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">WebApiApplication</span> <span class="p">:</span> <span class="n">HttpApplication</span>
+<span class="p">{</span>
+  <span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="n">GlobalConfiguration</span><span class="p">.</span><span class="nf">Configure</span><span class="p">(</span><span class="n">configuration</span> <span class="p">=&gt;</span>
+    <span class="p">{</span>
+      <span class="c1">// calling our extension method</span>
+      <span class="n">configuration</span><span class="p">.</span><span class="nf">AddDependencyInjection</span><span class="p">();</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Part of the solution was taken from an <a href="https://scottdorman.blog/2016/03/17/integrating-asp-net-core-dependency-injection-in-mvc-4/">article</a> by Scott Dorman.</p>
+
+<p>The above source code can also be found in <a href="https://github.com/burmistrov-tech/extensions-dependencyresolver">this</a> repository on GitHub, feel free to open a pull request if something has been missed.</p>]]></content><author><name></name></author><category term="csharp" /><category term="aspnet" /><summary type="html"><![CDATA[If you have been “lucky” enough to work with the ASP.NET Web project, then most likely you have had experience with different dependency injection libraries. For a long time Unity, Autofac, Ninject, and others have successfully covered dependency injection needs, each of them supports ASP.NET Web and provide their own IoC containers that have a quite comfortable API to work with (except Unity, it is terrible), but there is still one little problem. Hot Fuzz (2007) The arrival of ASP.NET Core and with it Microsoft.Extensions.DependencyInjection set a new standard in dependency injection. Every modern solution now focuses on Microsoft DI and provides extension methods compatible with IServiceCollection. For example, if you want to use Serilog in your solution, you can achieve this with a few lines of code. var container = new ServiceCollection(); container.AddLogging(builder =&gt; builder.AddSerilog(logger)); But unfortunately, Microsoft DI doesn’t implement IDependencyResolver out of the box, which is the interface ASP.NET Web uses to resolve dependencies. Below, I’ll show you how to implement this interface yourself, but first, let’s look at it. Under the hood namespace System.Web.Http.Dependencies { /// &lt;summary&gt;Represents a dependency injection container.&lt;/summary&gt; public interface IDependencyResolver : IDependencyScope, IDisposable { /// &lt;summary&gt; Starts a resolution scope. &lt;/summary&gt; /// &lt;returns&gt;The dependency scope.&lt;/returns&gt; IDependencyScope BeginScope(); } /// &lt;summary&gt;Represents an interface for the range of the dependencies.&lt;/summary&gt; public interface IDependencyScope : IDisposable { /// &lt;summary&gt;Retrieves a service from the scope.&lt;/summary&gt; /// &lt;returns&gt;The retrieved service.&lt;/returns&gt; /// &lt;param name="serviceType"&gt;The service to be retrieved.&lt;/param&gt; object GetService(Type serviceType); /// &lt;summary&gt;Retrieves a collection of services from the scope.&lt;/summary&gt; /// &lt;returns&gt;The retrieved collection of services.&lt;/returns&gt; /// &lt;param name="serviceType"&gt;The collection of services to be retrieved.&lt;/param&gt; IEnumerable&lt;object&gt; GetServices(Type serviceType); } } If we compare IServiceProvider and IDependencyResolver, they are generally similar. Except that IServiceProvider contains generic overloaded methods and asynchronous scoping. Therefore, all we need is to make them compatible to convert one interface to the other. Adapting IServiceProvider to IDependencyResolver public class DependencyInjectionResolver : IDependencyResolver, IServiceProvider, IAsyncDisposable { private readonly IServiceProvider _serviceProvider; private bool _disposed; public DependencyInjectionResolver(IServiceProvider serviceProvider) { _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider)); } public IDependencyScope BeginScope() { var scope = _serviceProvider.CreateScope(); return new DependencyInjectionResolver(scope.ServiceProvider); } public object GetService(Type serviceType) { if (serviceType == null) throw new ArgumentNullException(nameof(serviceType)); return _serviceProvider.GetService(serviceType); } public IEnumerable&lt;object&gt; GetServices(Type serviceType) { if (serviceType == null) throw new ArgumentNullException(nameof(serviceType)); return _serviceProvider.GetServices(serviceType); } public void Dispose() { if (_disposed || !(_serviceProvider is IDisposable disposable)) return; _disposed = true; disposable.Dispose(); } public ValueTask DisposeAsync() { if (_disposed) return default; if (_serviceProvider is IAsyncDisposable asyncDisposable) { _disposed = true; return asyncDisposable.DisposeAsync(); } Dispose(); return default; } } The implementation is quite simple, IServiceProvider passes in the constructor delegated to retrieve services and being (create) scopes. We implement IServiceProvider itself to work with DependencyInjectionResolver in the same way as the ServiceProvider itself using extension methods We implement IDisposable and IAsyncDisposable in case we need to release resources from the scope public static class ServiceCollectionExtensions { public static IServiceCollection AddWebApiControllers(this IServiceCollection services) { if (services == null) throw new ArgumentNullException(nameof(services)); var controllers = Assembly.GetExecutingAssembly().ExportedTypes .Where(t =&gt; !t.IsAbstract &amp;&amp; !t.IsGenericTypeDefinition) .Where(t =&gt; typeof(IHttpController).IsAssignableFrom(t) || t.Name.EndsWith("Controller", StringComparison.OrdinalIgnoreCase)); foreach (var controller in controllers) { services.AddTransient(controller); } return services; } public static DependencyInjectionResolver ToDependencyResolver(this IServiceCollection services) { if (services == null) throw new ArgumentNullException(nameof(services)); var serviceProvider = services.BuildServiceProvider(); return new DependencyInjectionResolver(serviceProvider); } } In addition, two extension methods will help us: AddWebApiControllers registeres controllers as Transient, otherwise there will be a runtime error DependencyInjectionResolver allows us simply build a service prvoider and create a new instance of DependencyInjectionResolver How to use DependencyInjectionResolver public static class HttpConfigurationExtensions { public static void AddDependencyInjection(this HttpConfiguration httpConfiguration) { var container = new ServiceCollection(); container .AddWebApiControllers() .AddSingleton&lt;IServiceOne, ServiceOne&gt;() .AddSingleton&lt;IServiceTwo, ServiceTwo&gt;(); httpConfiguration.DependencyResolver = container.ToDependencyResolver(); } } public class WebApiApplication : HttpApplication { protected void Application_Start() { GlobalConfiguration.Configure(configuration =&gt; { // calling our extension method configuration.AddDependencyInjection(); }); } } Part of the solution was taken from an article by Scott Dorman. The above source code can also be found in this repository on GitHub, feel free to open a pull request if something has been missed.]]></summary></entry><entry><title type="html">How to Handle ListItem Properties?</title><link href="https://www.burmistrov.tech/2022/05/15/how-to-handle-listitem-propeties.html" rel="alternate" type="text/html" title="How to Handle ListItem Properties?" /><published>2022-05-15T00:00:00+02:00</published><updated>2022-05-15T00:00:00+02:00</updated><id>https://www.burmistrov.tech/2022/05/15/how-to-handle-listitem-propeties</id><content type="html" xml:base="https://www.burmistrov.tech/2022/05/15/how-to-handle-listitem-propeties.html"><![CDATA[<p>During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with <code class="language-plaintext highlighter-rouge">Microsoft.SharePoint.Client</code> library.</p>
 
 <p><img src="/generated/back-to-the-future-680-03146d8e0.jpg" srcset="/generated/back-to-the-future-200-03146d8e0.jpg 200w, /generated/back-to-the-future-400-03146d8e0.jpg 400w, /generated/back-to-the-future-680-03146d8e0.jpg 680w" />
  <span class="caption">Back to the Future (1985) </span></p>
@@ -24,7 +201,7 @@
   <p>Static methods are like the cancer of object-oriented programming software: once we let them settle in our code, we cannot get rid of them - their colony will only grow. Just avoid them in principle.</p>
 </blockquote>
 
-<p>You may not believe me, but this is the most common way of obtaining values that I have encountered. The problem here is that we already know what type to expect in the <em>ListItem</em>, based on the type we set in the settings of our List. The relation of .NET types to field types in SharePoint is below.</p>
+<p>You may not believe me, but this is the most common way of obtaining values that I have encountered. The problem here is that we already know what type to expect in the <code class="language-plaintext highlighter-rouge">ListItem</code>, based on the type we set in the settings of our List. The relation of .NET types to field types in SharePoint is below.</p>
 
 <table>
   <tbody>
@@ -67,7 +244,7 @@
   </tbody>
 </table>
 
-<p>As you can see, all fields allow null values. We will have different results in case null value, if we use a <em>static class Convert</em> and if we use a usual unpacking.</p>
+<p>As you can see, all fields allow null values. We will have different results in case null value, if we use a static class <code class="language-plaintext highlighter-rouge">Convert</code> and if we use a usual unpacking.</p>
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// is true</span>
 <span class="kt">bool</span> <span class="n">isNull</span> <span class="p">=</span> <span class="n">item</span><span class="p">[</span><span class="s">"TestItemText"</span><span class="p">]</span> <span class="p">==</span> <span class="k">null</span><span class="p">;</span> 
 
@@ -77,7 +254,7 @@
 <span class="c1">// null</span>
 <span class="kt">string</span> <span class="n">castedText</span> <span class="p">=</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="n">item</span><span class="p">[</span><span class="s">"TestItemText"</span><span class="p">];</span>
 </code></pre></div></div>
-<p>To explain this behavior, we need to look at the source code of the <em>Convert.ToString</em> method.</p>
+<p>To explain this behavior, we need to look at the source code of the <code class="language-plaintext highlighter-rouge">Convert.ToString</code> method.</p>
 
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">__DynamicallyInvokable</span><span class="p">]</span>
 <span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">ToString</span><span class="p">(</span><span class="kt">object</span> <span class="k">value</span><span class="p">)</span> <span class="p">=&gt;</span>
@@ -149,6 +326,6 @@
 <h2 id="what-else-can-be-improved">What else can be improved?</h2>
 
 <p>The solution that we considered fits perfectly with the Rich Domain Model in small projects where we don’t always need to do mapping of SharePoint entities and domain entities. But in large projects, we have to deal with a large number of entities and the process of manual mapping becomes not the most optimal solution.
-I have ideas about developing automatic mapping for SharePoint entities similar to <em>System.Text.Json Serializer</em>.</p>
+I have ideas about developing automatic mapping for SharePoint entities similar to <code class="language-plaintext highlighter-rouge">System.Text.Json Serializer</code>.</p>
 
 <p>What do you think, will it be useful?</p>]]></content><author><name></name></author><category term="csharp" /><category term="sharepoint" /><summary type="html"><![CDATA[During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with Microsoft.SharePoint.Client library. Back to the Future (1985) One of the most popular tasks is to get an item from a list and get its fields then. Let’s look at the situation of obtaining fields of the ListItem object. using (var context = new ClientContext(url)) { List list = context.Web.GetList("Lists/items"); ListItem item = list.GetItemById(1); context.Load(item); context.ExecuteQuery(); // Here is the problem string textField = Convert.ToString(item["TestItemText"]); double numberField = Convert.ToDouble(item["TestItemNumber"]); DateTime dateField = Convert.ToDateTime(item["TestItemDate"]); return new { Text = textField, Number = numberField }; } Static methods are like the cancer of object-oriented programming software: once we let them settle in our code, we cannot get rid of them - their colony will only grow. Just avoid them in principle. You may not believe me, but this is the most common way of obtaining values that I have encountered. The problem here is that we already know what type to expect in the ListItem, based on the type we set in the settings of our List. The relation of .NET types to field types in SharePoint is below. C# Type SharePoint Type string Text, Note, Choice double? Number decimal? Currency DateTime? Date and time bool? Boolean FieldUserValue User or Group FieldLookupValue Lookup FieldUrlValue File or URL As you can see, all fields allow null values. We will have different results in case null value, if we use a static class Convert and if we use a usual unpacking. // is true bool isNull = item["TestItemText"] == null; // string.Empty string convertedText = Convert.ToString(item["TestItemText"]); // null string castedText = (string) item["TestItemText"]; To explain this behavior, we need to look at the source code of the Convert.ToString method. [__DynamicallyInvokable] public static string ToString(object value) =&gt; Convert.ToString(value, (IFormatProvider) null); [__DynamicallyInvokable] public static string ToString(object value, IFormatProvider provider) { switch (value) { case IConvertible convertible: return convertible.ToString(provider); case IFormattable formattable: return formattable.ToString((string) null, provider); // in that case case null: return string.Empty; default: return value.ToString(); } } Fail Fast and Fail Safe I would rather fail faster with Cast error when testing the method than get unexpected values somewhere in other services. If we have made sure with SharePoint types, we can simply convert the object type to the desired value type. Just don’t forget to set a nullable value type or set a desirable default value, in case of null. var textField = (string) item["TestItemText"]; var numberField = (double?) item["TestItemNumber"]; // desirable default value var dateField = (DateTime?) item["TestItemDate"] ?? new DateTime(2022, 01, 01); Furthermore, we are able to add a little syntactic sugar and simplify obtaining values from the ListItem and implement the TryGet pattern for exception handling. public static class Extensions { public static T GetFieldValue&lt;T&gt;(this ListItem item, string fieldName) { return (T) item[fieldName]; }; public static bool TryGetFieldValue&lt;T&gt;(this ListItem item, string fieldName, out T value) { value = default; try { value = (T) item[fieldName]; return true; } catch { return false; } } } var textField = item.GetFieldValue&lt;string&gt;("TestItemText"); var numberField = item.GetFieldValue&lt;double?&gt;("TestItemNumber"); if (item.TryGetFieldValue&lt;DateTime&gt;("TestItemDate", out var dateField)) { _logger.LogInformation("Unexpected null value or type error with TestItemDate field"); } Agree, it looks much nicer than before. What else can be improved? The solution that we considered fits perfectly with the Rich Domain Model in small projects where we don’t always need to do mapping of SharePoint entities and domain entities. But in large projects, we have to deal with a large number of entities and the process of manual mapping becomes not the most optimal solution. I have ideas about developing automatic mapping for SharePoint entities similar to System.Text.Json Serializer. What do you think, will it be useful?]]></summary></entry></feed>

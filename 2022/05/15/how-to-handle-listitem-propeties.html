@@ -12,10 +12,12 @@
   <nav class="links">
     <ul class="static">
       <li><a href="/">Home</a></li>
-      <li><a href="/rss.xml">Subscribe</a></li>
       <li><a href="/about-me.html">About Me</a></li>
     </ul>
     <ul class="social">
+      <li><a href="/rss.xml" target="_blank" rel="noopener noreferrer"
+        title="Subscribe to me using RSS"><i class="icon-rss notranslate" aria-hidden="true"></i></a>
+      </li>
       <li><a href="https://www.linkedin.com/in/burmistrov-tech" target="_blank" rel="noopener noreferrer"
         title="My LinkedIn profile"><i class="icon-linkedin notranslate" aria-hidden="true"></i></a>
       </li>
@@ -55,7 +57,7 @@
     </time>
   </li>
   <li itemprop="wordCount">
-    1096 words
+    1106 words
   </li>
   <li>
     
@@ -71,7 +73,7 @@
   <ul class="post-tags"><li class="tag"><a href="/tags/csharp">#csharp</a></li><li class="tag"><a href="/tags/sharepoint">#sharepoint</a></li><li><a href="/tags">see all tags</a></li>
   </ul>
 </div>
-  <p>During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with <em>Microsoft.SharePoint.Client</em> library.</p>
+  <p>During my work with the SharePoint client library, I have encountered many different approaches to working with it. We can consider SharePoint as a niche technology, in some ways already obsolete. But unfortunately, after many years of using this library have not had time to develop good approaches to use, with clear examples and good documentation. With this article, I want to run a series of articles about working with <code class="language-plaintext highlighter-rouge">Microsoft.SharePoint.Client</code> library.</p>
 
 <p><img src="/generated/back-to-the-future-680-03146d8e0.jpg" srcset="/generated/back-to-the-future-200-03146d8e0.jpg 200w, /generated/back-to-the-future-400-03146d8e0.jpg 400w, /generated/back-to-the-future-680-03146d8e0.jpg 680w" />
  <span class="caption">Back to the Future (1985) </span></p>
@@ -97,7 +99,7 @@
   <p>Static methods are like the cancer of object-oriented programming software: once we let them settle in our code, we cannot get rid of them - their colony will only grow. Just avoid them in principle.</p>
 </blockquote>
 
-<p>You may not believe me, but this is the most common way of obtaining values that I have encountered. The problem here is that we already know what type to expect in the <em>ListItem</em>, based on the type we set in the settings of our List. The relation of .NET types to field types in SharePoint is below.</p>
+<p>You may not believe me, but this is the most common way of obtaining values that I have encountered. The problem here is that we already know what type to expect in the <code class="language-plaintext highlighter-rouge">ListItem</code>, based on the type we set in the settings of our List. The relation of .NET types to field types in SharePoint is below.</p>
 
 <table>
   <tbody>
@@ -140,7 +142,7 @@
   </tbody>
 </table>
 
-<p>As you can see, all fields allow null values. We will have different results in case null value, if we use a <em>static class Convert</em> and if we use a usual unpacking.</p>
+<p>As you can see, all fields allow null values. We will have different results in case null value, if we use a static class <code class="language-plaintext highlighter-rouge">Convert</code> and if we use a usual unpacking.</p>
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// is true</span>
 <span class="kt">bool</span> <span class="n">isNull</span> <span class="p">=</span> <span class="n">item</span><span class="p">[</span><span class="s">"TestItemText"</span><span class="p">]</span> <span class="p">==</span> <span class="k">null</span><span class="p">;</span> 
 
@@ -150,7 +152,7 @@
 <span class="c1">// null</span>
 <span class="kt">string</span> <span class="n">castedText</span> <span class="p">=</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="n">item</span><span class="p">[</span><span class="s">"TestItemText"</span><span class="p">];</span>
 </code></pre></div></div>
-<p>To explain this behavior, we need to look at the source code of the <em>Convert.ToString</em> method.</p>
+<p>To explain this behavior, we need to look at the source code of the <code class="language-plaintext highlighter-rouge">Convert.ToString</code> method.</p>
 
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">__DynamicallyInvokable</span><span class="p">]</span>
 <span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">ToString</span><span class="p">(</span><span class="kt">object</span> <span class="k">value</span><span class="p">)</span> <span class="p">=&gt;</span>
@@ -222,7 +224,7 @@
 <h2 id="what-else-can-be-improved">What else can be improved?</h2>
 
 <p>The solution that we considered fits perfectly with the Rich Domain Model in small projects where we don’t always need to do mapping of SharePoint entities and domain entities. But in large projects, we have to deal with a large number of entities and the process of manual mapping becomes not the most optimal solution.
-I have ideas about developing automatic mapping for SharePoint entities similar to <em>System.Text.Json Serializer</em>.</p>
+I have ideas about developing automatic mapping for SharePoint entities similar to <code class="language-plaintext highlighter-rouge">System.Text.Json Serializer</code>.</p>
 
 <p>What do you think, will it be useful?</p>
 

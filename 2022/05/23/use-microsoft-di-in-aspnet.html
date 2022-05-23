@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nikita Burmistrov | Use Microsoft Dependency Injection in your ASP.NET Web project</title>
+  <link rel="stylesheet" href="https://www.burmistrov.tech/assets/css/layout.css" />
+  <link rel="shortcut icon" href="/favicon.ico"/>
+</head><body>
+
+    <div class="wrapper"><header>
+  <nav class="links">
+    <ul class="static">
+      <li><a href="/">Home</a></li>
+      <li><a href="/about-me.html">About Me</a></li>
+    </ul>
+    <ul class="social">
+      <li><a href="/rss.xml" target="_blank" rel="noopener noreferrer"
+        title="Subscribe to me using RSS"><i class="icon-rss notranslate" aria-hidden="true"></i></a>
+      </li>
+      <li><a href="https://www.linkedin.com/in/burmistrov-tech" target="_blank" rel="noopener noreferrer"
+        title="My LinkedIn profile"><i class="icon-linkedin notranslate" aria-hidden="true"></i></a>
+      </li>
+      <li><a href="https://github.com/burmistrov-tech" target="_blank" rel="noopener noreferrer"
+        title="Follow my GitHub prifle"><i class="icon-github notranslate" aria-hidden="true"></i></a>
+      </li>
+      <li><a href="https://t.me/burmistrov_tech" target="_blank" rel="noopener noreferrer"
+        title="Contant with me via Telegram"><i class="icon-telegram notranslate" aria-hidden="true"></i></a>
+      </li>
+    </ul>  
+  </nav>
+</header><article class="markdown-body" itemscope="" itemtype="http://schema.org/BlogPosting">
+  <div itemprop="image" itemscope="" itemtype="http://schema.org/ImageObject">
+    <meta itemprop="url" content="https://www.burmistrov.tech/images/image.png"/>
+    <meta itemprop="height" content="250"/>
+    <meta itemprop="width" content="250"/>
+  </div>
+  <meta itemprop="image" content=""/>
+  <div itemscope="" itemprop="author" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Nikita Burmistrov"/>
+  </div>
+  <div itemscope="" itemprop="publisher" itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Nikita Burmistrov"/>
+    <div itemprop="logo" itemscope="" itemtype="http://schema.org/ImageObject">
+      <meta itemprop="url" content="https://www.burmistrov.tech/images/image.png"/>
+      <meta itemprop="height" content="250"/>
+      <meta itemprop="width" content="250"/>
+    </div>
+  </div>
+  <div class="title">
+    <h1 itemprop="name headline mainEntityOfPage">Use Microsoft Dependency Injection in your ASP.NET Web project</h1>
+
+<ul class="post-metadata">
+  <li>
+    <time itemprop="datePublished dateModified" datetime="2022-05-23T00:00:00+02:00">
+      23 May 2022
+    </time>
+  </li>
+  <li itemprop="wordCount">
+    1209 words
+  </li>
+  <li>
+    
+    7 minutes to read
+  </li>
+  <li class="m-hide">
+    <i class="icon-comment"></i>
+    <a href="https://www.burmistrov.tech/2022/05/23/use-microsoft-di-in-aspnet.html#disqus_thread" itemprop="discussionUrl"></a>
+  </li>
+</ul>
+
+<script id="dsq-count-scr" src="//www-burmistrov-tech.disqus.com/count.js" async></script>
+  <ul class="post-tags"><li class="tag"><a href="/tags/csharp">#csharp</a></li><li class="tag"><a href="/tags/aspnet">#aspnet</a></li><li><a href="/tags">see all tags</a></li>
+  </ul>
+</div>
+  <p>If you have been “lucky” enough to work with the ASP.NET Web project, then most likely you have had experience with different dependency injection libraries. For a long time Unity, Autofac, Ninject, and others have successfully covered dependency injection needs, each of them supports ASP.NET Web and provide their own IoC containers that have a quite comfortable API to work with (except Unity, it is terrible), but there is still one little problem.</p>
+
+<p><img src="/generated/hot-fuzz-2007-680-737db6c11.jpg" srcset="/generated/hot-fuzz-2007-200-737db6c11.jpg 200w, /generated/hot-fuzz-2007-400-737db6c11.jpg 400w, /generated/hot-fuzz-2007-680-737db6c11.jpg 680w" />
+ <span class="caption">Hot Fuzz (2007) </span></p>
+
+<p>The arrival of ASP.NET Core and with it <code class="language-plaintext highlighter-rouge">Microsoft.Extensions.DependencyInjection</code> set a new standard in dependency injection. Every modern solution now focuses on Microsoft DI and provides extension methods compatible with <code class="language-plaintext highlighter-rouge">IServiceCollection</code>. For example, if you want to use <a href="https://github.com/serilog/serilog-extensions-logging">Serilog</a> in your solution, you can achieve this with a few lines of code.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">ServiceCollection</span><span class="p">();</span>
+
+<span class="n">container</span><span class="p">.</span><span class="nf">AddLogging</span><span class="p">(</span><span class="n">builder</span> <span class="p">=&gt;</span> <span class="n">builder</span><span class="p">.</span><span class="nf">AddSerilog</span><span class="p">(</span><span class="n">logger</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>But unfortunately, Microsoft DI doesn’t implement <code class="language-plaintext highlighter-rouge">IDependencyResolver</code> out of the box, which is the interface ASP.NET Web uses to resolve dependencies. Below, I’ll show you how to implement this interface yourself, but first, let’s look at it.</p>
+
+<h2 id="under-the-hood">Under the hood</h2>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">namespace</span> <span class="nn">System.Web.Http.Dependencies</span>
+<span class="p">{</span>
+  <span class="c1">/// &lt;summary&gt;Represents a dependency injection container.&lt;/summary&gt;</span>
+  <span class="k">public</span> <span class="k">interface</span> <span class="nc">IDependencyResolver</span> <span class="p">:</span> <span class="n">IDependencyScope</span><span class="p">,</span> <span class="n">IDisposable</span>
+  <span class="p">{</span>
+    <span class="c1">/// &lt;summary&gt; Starts a resolution scope. &lt;/summary&gt;</span>
+    <span class="c1">/// &lt;returns&gt;The dependency scope.&lt;/returns&gt;</span>
+    <span class="n">IDependencyScope</span> <span class="nf">BeginScope</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="c1">/// &lt;summary&gt;Represents an interface for the range of the dependencies.&lt;/summary&gt;</span>
+  <span class="k">public</span> <span class="k">interface</span> <span class="nc">IDependencyScope</span> <span class="p">:</span> <span class="n">IDisposable</span>
+  <span class="p">{</span>
+    <span class="c1">/// &lt;summary&gt;Retrieves a service from the scope.&lt;/summary&gt;</span>
+    <span class="c1">/// &lt;returns&gt;The retrieved service.&lt;/returns&gt;</span>
+    <span class="c1">/// &lt;param name="serviceType"&gt;The service to be retrieved.&lt;/param&gt;</span>
+    <span class="kt">object</span> <span class="nf">GetService</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">);</span>
+
+    <span class="c1">/// &lt;summary&gt;Retrieves a collection of services from the scope.&lt;/summary&gt;</span>
+    <span class="c1">/// &lt;returns&gt;The retrieved collection of services.&lt;/returns&gt;</span>
+    <span class="c1">/// &lt;param name="serviceType"&gt;The collection of services to be retrieved.&lt;/param&gt;</span>
+    <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="kt">object</span><span class="p">&gt;</span> <span class="nf">GetServices</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If we compare <code class="language-plaintext highlighter-rouge">IServiceProvider</code> and <code class="language-plaintext highlighter-rouge">IDependencyResolver</code>, they are generally similar. Except that <code class="language-plaintext highlighter-rouge">IServiceProvider</code> contains generic overloaded methods and asynchronous scoping. Therefore, all we need is to make them compatible to convert one interface to the other.</p>
+
+<h2 id="adapting-iserviceprovider-to-idependencyresolver">Adapting IServiceProvider to IDependencyResolver</h2>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">DependencyInjectionResolver</span> <span class="p">:</span> <span class="n">IDependencyResolver</span><span class="p">,</span> <span class="n">IServiceProvider</span><span class="p">,</span> <span class="n">IAsyncDisposable</span>
+<span class="p">{</span>
+  <span class="k">private</span> <span class="k">readonly</span> <span class="n">IServiceProvider</span> <span class="n">_serviceProvider</span><span class="p">;</span>
+  <span class="k">private</span> <span class="kt">bool</span> <span class="n">_disposed</span><span class="p">;</span>
+
+  <span class="k">public</span> <span class="nf">DependencyInjectionResolver</span><span class="p">(</span><span class="n">IServiceProvider</span> <span class="n">serviceProvider</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">_serviceProvider</span> <span class="p">=</span> <span class="n">serviceProvider</span> <span class="p">??</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">serviceProvider</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="n">IDependencyScope</span> <span class="nf">BeginScope</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="kt">var</span> <span class="n">scope</span> <span class="p">=</span> <span class="n">_serviceProvider</span><span class="p">.</span><span class="nf">CreateScope</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">DependencyInjectionResolver</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="n">ServiceProvider</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="kt">object</span> <span class="nf">GetService</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">serviceType</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">serviceType</span><span class="p">));</span>
+    
+    <span class="k">return</span> <span class="n">_serviceProvider</span><span class="p">.</span><span class="nf">GetService</span><span class="p">(</span><span class="n">serviceType</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="kt">object</span><span class="p">&gt;</span> <span class="nf">GetServices</span><span class="p">(</span><span class="n">Type</span> <span class="n">serviceType</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">serviceType</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">serviceType</span><span class="p">));</span>
+    
+    <span class="k">return</span> <span class="n">_serviceProvider</span><span class="p">.</span><span class="nf">GetServices</span><span class="p">(</span><span class="n">serviceType</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="k">void</span> <span class="nf">Dispose</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_disposed</span> <span class="p">||</span> <span class="p">!(</span><span class="n">_serviceProvider</span> <span class="k">is</span> <span class="n">IDisposable</span> <span class="n">disposable</span><span class="p">))</span> <span class="k">return</span><span class="p">;</span>
+    
+    <span class="n">_disposed</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+    <span class="n">disposable</span><span class="p">.</span><span class="nf">Dispose</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="n">ValueTask</span> <span class="nf">DisposeAsync</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_disposed</span><span class="p">)</span> <span class="k">return</span> <span class="k">default</span><span class="p">;</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="n">_serviceProvider</span> <span class="k">is</span> <span class="n">IAsyncDisposable</span> <span class="n">asyncDisposable</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">_disposed</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">asyncDisposable</span><span class="p">.</span><span class="nf">DisposeAsync</span><span class="p">();</span>
+    <span class="p">}</span>
+    
+    <span class="nf">Dispose</span><span class="p">();</span>
+    
+    <span class="k">return</span> <span class="k">default</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The implementation is quite simple, <code class="language-plaintext highlighter-rouge">IServiceProvider</code> passes in the constructor delegated to retrieve services and being (create) scopes.</p>
+<ul>
+  <li>We implement <code class="language-plaintext highlighter-rouge">IServiceProvider</code> itself to work with <code class="language-plaintext highlighter-rouge">DependencyInjectionResolver</code> in the same way as the <code class="language-plaintext highlighter-rouge">ServiceProvider</code> itself using extension methods</li>
+  <li>We implement <code class="language-plaintext highlighter-rouge">IDisposable</code> and <code class="language-plaintext highlighter-rouge">IAsyncDisposable</code> in case we need to release resources from the scope</li>
+</ul>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">ServiceCollectionExtensions</span>
+<span class="p">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="n">IServiceCollection</span> <span class="nf">AddWebApiControllers</span><span class="p">(</span><span class="k">this</span> <span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">services</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">services</span><span class="p">));</span>
+
+    <span class="kt">var</span> <span class="n">controllers</span> <span class="p">=</span> <span class="n">Assembly</span><span class="p">.</span><span class="nf">GetExecutingAssembly</span><span class="p">().</span><span class="n">ExportedTypes</span>
+      <span class="p">.</span><span class="nf">Where</span><span class="p">(</span><span class="n">t</span> <span class="p">=&gt;</span> <span class="p">!</span><span class="n">t</span><span class="p">.</span><span class="n">IsAbstract</span> <span class="p">&amp;&amp;</span> <span class="p">!</span><span class="n">t</span><span class="p">.</span><span class="n">IsGenericTypeDefinition</span><span class="p">)</span>
+      <span class="p">.</span><span class="nf">Where</span><span class="p">(</span><span class="n">t</span> <span class="p">=&gt;</span> <span class="k">typeof</span><span class="p">(</span><span class="n">IHttpController</span><span class="p">).</span><span class="nf">IsAssignableFrom</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="p">||</span> <span class="n">t</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="nf">EndsWith</span><span class="p">(</span><span class="s">"Controller"</span><span class="p">,</span> <span class="n">StringComparison</span><span class="p">.</span><span class="n">OrdinalIgnoreCase</span><span class="p">));</span>
+
+    <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">controller</span> <span class="k">in</span> <span class="n">controllers</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">services</span><span class="p">.</span><span class="nf">AddTransient</span><span class="p">(</span><span class="n">controller</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">services</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">public</span> <span class="k">static</span> <span class="n">DependencyInjectionResolver</span> <span class="nf">ToDependencyResolver</span><span class="p">(</span><span class="k">this</span> <span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">services</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentNullException</span><span class="p">(</span><span class="k">nameof</span><span class="p">(</span><span class="n">services</span><span class="p">));</span>
+    
+    <span class="kt">var</span> <span class="n">serviceProvider</span> <span class="p">=</span> <span class="n">services</span><span class="p">.</span><span class="nf">BuildServiceProvider</span><span class="p">();</span>
+    
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">DependencyInjectionResolver</span><span class="p">(</span><span class="n">serviceProvider</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In addition, two extension methods will help us:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">AddWebApiControllers</code> registeres controllers as <em>Transient</em>, otherwise there will be a runtime error</li>
+  <li><code class="language-plaintext highlighter-rouge">DependencyInjectionResolver</code> allows us simply build a service prvoider and create a new instance of <code class="language-plaintext highlighter-rouge">DependencyInjectionResolver</code></li>
+</ul>
+
+<h2 id="how-to-use-dependencyinjectionresolver">How to use DependencyInjectionResolver</h2>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">HttpConfigurationExtensions</span>
+<span class="p">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">AddDependencyInjection</span><span class="p">(</span><span class="k">this</span> <span class="n">HttpConfiguration</span> <span class="n">httpConfiguration</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="kt">var</span> <span class="n">container</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">ServiceCollection</span><span class="p">();</span>
+
+    <span class="n">container</span>
+      <span class="p">.</span><span class="nf">AddWebApiControllers</span><span class="p">()</span>
+      <span class="p">.</span><span class="n">AddSingleton</span><span class="p">&lt;</span><span class="n">IServiceOne</span><span class="p">,</span> <span class="n">ServiceOne</span><span class="p">&gt;()</span>
+      <span class="p">.</span><span class="n">AddSingleton</span><span class="p">&lt;</span><span class="n">IServiceTwo</span><span class="p">,</span> <span class="n">ServiceTwo</span><span class="p">&gt;();</span>
+
+    <span class="n">httpConfiguration</span><span class="p">.</span><span class="n">DependencyResolver</span> <span class="p">=</span> <span class="n">container</span><span class="p">.</span><span class="nf">ToDependencyResolver</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">WebApiApplication</span> <span class="p">:</span> <span class="n">HttpApplication</span>
+<span class="p">{</span>
+  <span class="k">protected</span> <span class="k">void</span> <span class="nf">Application_Start</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="n">GlobalConfiguration</span><span class="p">.</span><span class="nf">Configure</span><span class="p">(</span><span class="n">configuration</span> <span class="p">=&gt;</span>
+    <span class="p">{</span>
+      <span class="c1">// calling our extension method</span>
+      <span class="n">configuration</span><span class="p">.</span><span class="nf">AddDependencyInjection</span><span class="p">();</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Part of the solution was taken from an <a href="https://scottdorman.blog/2016/03/17/integrating-asp-net-core-dependency-injection-in-mvc-4/">article</a> by Scott Dorman.</p>
+
+<p>The above source code can also be found in <a href="https://github.com/burmistrov-tech/extensions-dependencyresolver">this</a> repository on GitHub, feel free to open a pull request if something has been missed.</p>
+
+</article>
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://www-burmistrov-tech.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><footer>
+  <p class="copyright">&copy; Nikita Burmistrov - 2022</p>
+</footer></div>
+    
+  </body>
+
+</html>
