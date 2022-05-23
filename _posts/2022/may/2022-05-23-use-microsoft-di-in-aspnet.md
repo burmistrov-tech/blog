@@ -1,13 +1,15 @@
 ---
 layout: post
 title: "Use Microsoft Dependency Injection in your ASP.NET Web project"
-date: 2022-05-22
+date: 2022-05-23
 tags: |
   csharp
   aspnet
 ---
 
 If you have been "lucky" enough to work with the ASP.NET Web project, then most likely you have had experience with different dependency injection libraries. For a long time Unity, Autofac, Ninject, and others have successfully covered dependency injection needs, each of them supports ASP.NET Web and provide their own IoC containers that have a quite comfortable API to work with (except Unity, it is terrible), but there is still one little problem.
+
+{% picture hot-fuzz-2007.jpg %} {% caption Hot Fuzz (2007) %}
 
 The arrival of ASP.NET Core and with it `Microsoft.Extensions.DependencyInjection` set a new standard in dependency injection. Every modern solution now focuses on Microsoft DI and provides extension methods compatible with `IServiceCollection`. For example, if you want to use [Serilog](https://github.com/serilog/serilog-extensions-logging) in your solution, you can achieve this with a few lines of code.
 
